@@ -1,0 +1,23 @@
+{
+  "name": "lbdapi",
+  "version": "1.0.0",
+  "description": "Api documentation for the LBDserver back- and frontend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LBDserver/API.git"
+  },
+  "keywords": [
+    "LBDserver",
+    "LBD"
+  ],
+  "author": "Jeroen Werbrouck",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LBDserver/API/issues"
+  },
+  "homepage": "https://github.com/LBDserver/API#readme"
+}
