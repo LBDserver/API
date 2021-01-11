@@ -9,6 +9,6 @@ Separate repository to use the same object types in the LBDserver front- and bac
 - Graph (opt. extensions: namedGraph, aclGraph, metaGraph)
 - Document
 
-Install by adding the following to your package.json dependencies {
+Install by adding the following to your package.json dependencies:
 "lbd-api": "git://github.com/LBDserver/API"
-}
+
