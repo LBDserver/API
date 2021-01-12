@@ -4,7 +4,7 @@ import {
     ILoginRequest,
     IReturnUser,
     IAuthRequest
-} from './userInterface'
+} from './src/userInterface'
 
 import {
     ICreateProject,
@@ -12,7 +12,7 @@ import {
     IUploadResourceRequest,
     IReturnResource,
     IQueryResults
-} from './projectInterface'
+} from './src/projectInterface'
 
 export {
     ICreateProject,
