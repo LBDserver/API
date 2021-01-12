@@ -1,5 +1,5 @@
 import * as express from 'express'
-import { IUserDocument } from '../projectApi/documentApi/mongodb/models/UserModel'
+import * as mongoose from 'mongoose'
 
 interface ILoginRequest {
     email: string,
@@ -29,6 +29,10 @@ interface IAuthRequest extends express.Request {
     user: IUserDocument | undefined,
     token: string | undefined,
     permissions?: string[] | undefined
+}
+
+interface IUserDocument extends mongoose.Document, IUser {
+    generateAuthToken(): string;
 }
 
 export {
