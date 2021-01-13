@@ -1,6 +1,6 @@
 import axios from 'axios'
-import * as USER from "./userInterface"
-import * as PROJECT from './projectInterface'
+import * as USER from "../interfaces/userInterface"
+import * as PROJECT from '../interfaces/projectInterface'
 import * as AXIOS from 'axios'
 import { translate, toSparql } from 'sparqlalgebrajs'
 

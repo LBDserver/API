@@ -1,0 +1,16 @@
+{
+    // Change this to match your project
+    "include": ["lib/*.ts", "lib/interfaces/userInterface.ts", "lib/interfaces/projectInterface.ts", "lib/functions/functions.ts"],
+  
+    "compilerOptions": {
+      // Tells TypeScript to read JS files, as
+      // normally they are ignored as source files
+      "allowJs": true,
+      // Generate d.ts files
+      "declaration": true,
+      // Types should go into this directory.
+      // Removing this would place the .d.ts files
+      // next to the .js files
+      "outDir": "./dist",
+    },
+  }
