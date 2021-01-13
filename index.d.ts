@@ -8,9 +8,10 @@ import {
 
 import {
     ICreateProject,
-    IReturnProject,
+    IReturnProject ,
     IUploadResourceRequest,
-    IReturnResource,
+    IReturnMetadata,
+    IReturnGraph,
     IQueryResults
 } from './src/projectInterface'
 
@@ -18,7 +19,8 @@ export {
     ICreateProject,
     IReturnProject,
     IUploadResourceRequest,
-    IReturnResource,
+    IReturnMetadata,
+    IReturnGraph,
     IQueryResults,
     IUser,
     IRegisterRequest,
