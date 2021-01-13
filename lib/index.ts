@@ -33,7 +33,8 @@ import {
     deleteGraph,
     queryProjectSelect,
     queryGraphSelect,
-    updateGraph
+    updateGraph,
+    queryMultiple
   } from './functions/functions'
 
 export {
@@ -65,5 +66,6 @@ export {
     deleteGraph,
     queryProjectSelect,
     queryGraphSelect,
-    updateGraph
+    updateGraph,
+    queryMultiple
 }

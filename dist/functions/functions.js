@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.updateGraph = exports.queryGraphSelect = exports.queryProjectSelect = exports.deleteGraph = exports.deleteResource = exports.getGraphMetadata = exports.deleteDocument = exports.deleteProject = exports.getDocumentMetadata = exports.getOneProject = exports.getDocument = exports.uploadGraph = exports.uploadDocument = exports.createProject = exports.getUserProjects = exports.login = exports.register = exports.logout = exports.getOpenProjects = void 0;
+exports.queryMultiple = exports.updateGraph = exports.queryGraphSelect = exports.queryProjectSelect = exports.deleteGraph = exports.deleteResource = exports.getGraphMetadata = exports.deleteDocument = exports.deleteProject = exports.getDocumentMetadata = exports.getOneProject = exports.getDocument = exports.uploadGraph = exports.uploadDocument = exports.createProject = exports.getUserProjects = exports.login = exports.register = exports.logout = exports.getOpenProjects = void 0;
 var axios_1 = require("axios");
 var sparqlalgebrajs_1 = require("sparqlalgebrajs");
 //////////////////// PROJECT FUNCTIONS ////////////////////
@@ -699,6 +699,64 @@ function queryProjectSelect(project, query, token) {
 }
 exports.queryProjectSelect = queryProjectSelect;
 /**
+ * Query multiple graphs with SPARQL SELECT.
+ * @param project
+ * @param query
+ * @param graphs
+ * @param token
+ */
+function queryMultiple(project, query, graphs, token) {
+    return __awaiter(this, void 0, void 0, function () {
+        var algebra, rdfGraphs_1, newAlgebra, url, response, config, data, error_19;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 5, , 6]);
+                    algebra = sparqlalgebrajs_1.translate(query, { quads: true });
+                    rdfGraphs_1 = [];
+                    graphs.forEach(function (graph) {
+                        rdfGraphs_1.push({ termType: "NamedNode", value: graph });
+                    });
+                    newAlgebra = {
+                        input: algebra,
+                        "default": rdfGraphs_1,
+                        type: "from",
+                        named: []
+                    };
+                    query = sparqlalgebrajs_1.toSparql(newAlgebra);
+                    console.log('query', query);
+                    url = modifyProjectUrl(project);
+                    url = url + "?query=" + encodeURIComponent(query.toString());
+                    console.log('url', url);
+                    response = void 0;
+                    if (!token) return [3 /*break*/, 2];
+                    config = {
+                        headers: {
+                            Authorization: "Bearer " + token
+                        }
+                    };
+                    return [4 /*yield*/, axios_1["default"].get(url, config)];
+                case 1:
+                    response = _a.sent();
+                    return [3 /*break*/, 4];
+                case 2: return [4 /*yield*/, axios_1["default"].get(url)];
+                case 3:
+                    response = _a.sent();
+                    _a.label = 4;
+                case 4:
+                    data = response.data.results;
+                    return [2 /*return*/, data];
+                case 5:
+                    error_19 = _a.sent();
+                    error_19.message = "Unable to query project; " + error_19.message;
+                    throw error_19;
+                case 6: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.queryMultiple = queryMultiple;
+/**
  * Query a graph with SPARQL SELECT.
  * @param project
  * @param query
@@ -706,7 +764,7 @@ exports.queryProjectSelect = queryProjectSelect;
  */
 function queryGraphSelect(url, query, token) {
     return __awaiter(this, void 0, void 0, function () {
-        var response, config, data, error_19;
+        var response, config, data, error_20;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -733,9 +791,9 @@ function queryGraphSelect(url, query, token) {
                     data = response.data.results;
                     return [2 /*return*/, data];
                 case 5:
-                    error_19 = _a.sent();
-                    error_19.message = "Unable to query graph; " + error_19.message;
-                    throw error_19;
+                    error_20 = _a.sent();
+                    error_20.message = "Unable to query graph; " + error_20.message;
+                    throw error_20;
                 case 6: return [2 /*return*/];
             }
         });
@@ -744,7 +802,7 @@ function queryGraphSelect(url, query, token) {
 exports.queryGraphSelect = queryGraphSelect;
 function updateProject(project, query, token) {
     return __awaiter(this, void 0, void 0, function () {
-        var url, response, config, error_20;
+        var url, response, config, error_21;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -769,9 +827,9 @@ function updateProject(project, query, token) {
                     _a.label = 4;
                 case 4: return [2 /*return*/];
                 case 5:
-                    error_20 = _a.sent();
-                    error_20.message = "Unable to update; " + error_20.message;
-                    throw error_20;
+                    error_21 = _a.sent();
+                    error_21.message = "Unable to update; " + error_21.message;
+                    throw error_21;
                 case 6: return [2 /*return*/];
             }
         });
@@ -785,7 +843,7 @@ function updateProject(project, query, token) {
  */
 function updateGraph(url, query, token) {
     return __awaiter(this, void 0, void 0, function () {
-        var urlProps, project, algebra, _i, _a, key, error_21;
+        var urlProps, project, algebra, _i, _a, key, error_22;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -820,9 +878,9 @@ function updateGraph(url, query, token) {
                     _b.sent();
                     return [2 /*return*/];
                 case 2:
-                    error_21 = _b.sent();
-                    error_21.message = "Unable to update graph; " + error_21.message;
-                    throw error_21;
+                    error_22 = _b.sent();
+                    error_22.message = "Unable to update graph; " + error_22.message;
+                    throw error_22;
                 case 3: return [2 /*return*/];
             }
         });

@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.updateGraph = exports.queryGraphSelect = exports.queryProjectSelect = exports.deleteGraph = exports.deleteResource = exports.getGraphMetadata = exports.deleteDocument = exports.deleteProject = exports.getDocumentMetadata = exports.getOneProject = exports.getDocument = exports.uploadGraph = exports.uploadDocument = exports.createProject = exports.getUserProjects = exports.login = exports.register = exports.logout = exports.getOpenProjects = void 0;
+exports.queryMultiple = exports.updateGraph = exports.queryGraphSelect = exports.queryProjectSelect = exports.deleteGraph = exports.deleteResource = exports.getGraphMetadata = exports.deleteDocument = exports.deleteProject = exports.getDocumentMetadata = exports.getOneProject = exports.getDocument = exports.uploadGraph = exports.uploadDocument = exports.createProject = exports.getUserProjects = exports.login = exports.register = exports.logout = exports.getOpenProjects = void 0;
 var functions_1 = require("./functions/functions");
 exports.getOpenProjects = functions_1.getOpenProjects;
 exports.logout = functions_1.logout;
@@ -21,3 +21,4 @@ exports.deleteGraph = functions_1.deleteGraph;
 exports.queryProjectSelect = functions_1.queryProjectSelect;
 exports.queryGraphSelect = functions_1.queryGraphSelect;
 exports.updateGraph = functions_1.updateGraph;
+exports.queryMultiple = functions_1.queryMultiple;

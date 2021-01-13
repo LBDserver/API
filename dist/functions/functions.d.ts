@@ -109,6 +109,14 @@ declare function deleteGraph(url: string, token?: string): Promise<void>;
  */
 declare function queryProjectSelect(project: string, query: string, token?: string): Promise<PROJECT.IQueryResults>;
 /**
+ * Query multiple graphs with SPARQL SELECT.
+ * @param project
+ * @param query
+ * @param graphs
+ * @param token
+ */
+declare function queryMultiple(project: string, query: string, graphs: string[], token?: string): Promise<PROJECT.IQueryResults>;
+/**
  * Query a graph with SPARQL SELECT.
  * @param project
  * @param query
@@ -122,4 +130,4 @@ declare function queryGraphSelect(url: string, query: string, token?: string): P
  * @param token
  */
 declare function updateGraph(url: string, query: string, token?: string): Promise<void>;
-export { getOpenProjects, logout, register, login, getUserProjects, createProject, uploadDocument, uploadGraph, getDocument, getOneProject, getDocumentMetadata, deleteProject, deleteDocument, getGraphMetadata, deleteResource, deleteGraph, queryProjectSelect, queryGraphSelect, updateGraph };
+export { getOpenProjects, logout, register, login, getUserProjects, createProject, uploadDocument, uploadGraph, getDocument, getOneProject, getDocumentMetadata, deleteProject, deleteDocument, getGraphMetadata, deleteResource, deleteGraph, queryProjectSelect, queryGraphSelect, updateGraph, queryMultiple };

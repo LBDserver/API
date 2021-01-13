@@ -473,6 +473,59 @@ async function queryProjectSelect(project: string, query: string, token?: string
   }
 }
 
+interface rdfNode {
+  termType: string,
+  value: string
+}
+
+/**
+ * Query multiple graphs with SPARQL SELECT.
+ * @param project 
+ * @param query 
+ * @param graphs
+ * @param token 
+ */
+async function queryMultiple(project: string, query: string, graphs: string[], token?: string): Promise<PROJECT.IQueryResults> {
+  try {
+
+    const algebra = translate(query, { quads: true })
+    const rdfGraphs: rdfNode[]  = []
+    graphs.forEach((graph: string) => {
+      rdfGraphs.push({ termType: "NamedNode", value: graph })
+    })
+
+    const newAlgebra = {
+      input: algebra,
+      default: rdfGraphs,
+      type: "from",
+      named: []
+    }
+    query = toSparql(newAlgebra)
+    console.log('query', query)
+
+    let url = modifyProjectUrl(project)
+    url = url + "?query=" + encodeURIComponent(query.toString())
+    console.log('url', url)
+    let response: AXIOS.AxiosResponse
+    if (token) {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      response = await axios.get(url, config)
+    } else {
+      response = await axios.get(url)
+    }
+    const data: PROJECT.IQueryResults = response.data.results
+    return data
+
+  } catch (error) {
+    error.message = `Unable to query project; ${error.message}`
+    throw error
+  }
+}
+
 /**
  * Query a graph with SPARQL SELECT.
  * @param project 
@@ -619,5 +672,6 @@ export {
   deleteGraph,
   queryProjectSelect,
   queryGraphSelect,
-  updateGraph
+  updateGraph,
+  queryMultiple
 }
