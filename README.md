@@ -413,9 +413,9 @@ The results of a SPARQL SELECT query.
 | Name | Type | Description |
 | --- | --- | --- |
 | head | <code>Object</code> |  |
-| head[].vars | <code>Array.&lt;string&gt;</code> |  |
+| head.vars | <code>Array.&lt;string&gt;</code> |  |
 | results | <code>Object</code> |  |
-| results[].bindings | <code>Array.&lt;Object&gt;</code> | links the variables to the results. |
+| results.bindings | <code>Array.&lt;Object&gt;</code> | links the variables to the results. |
 
 <a name="Graph"></a>
 
