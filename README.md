@@ -4,7 +4,7 @@ Documentation for the LBDserver project. Includes shared interfaces as well as f
 ## Functions
 
 <dl>
-<dt><a href="#register">register(username, email, password)</a> ⇒ <code>Promise.&lt;returnUser&gt;</code></dt>
+<dt><a href="#register">register(username, email, password)</a> ⇒ <code><a href="#returnUser">Promise.&lt;returnUser&gt;</a></code></dt>
 <dd><p>Register as a user to the local LBDserver (backend defined in process.env.REACT_APP_BACKEND).</p>
 </dd>
 <dt><a href="#login">login(email, password)</a></dt>
@@ -69,13 +69,22 @@ Documentation for the LBDserver project. Includes shared interfaces as well as f
 </dd>
 </dl>
 
+## Typedefs
+
+<dl>
+<dt><a href="#User">User</a> : <code>Object</code></dt>
+<dd></dd>
+<dt><a href="#returnUser">returnUser</a> : <code>Object</code></dt>
+<dd></dd>
+</dl>
+
 <a name="register"></a>
 
-## register(username, email, password) ⇒ <code>Promise.&lt;returnUser&gt;</code>
+## register(username, email, password) ⇒ [<code>Promise.&lt;returnUser&gt;</code>](#returnUser)
 Register as a user to the local LBDserver (backend defined in process.env.REACT_APP_BACKEND).
 
 **Kind**: global function  
-**Returns**: <code>Promise.&lt;returnUser&gt;</code> - Returns a User object and a token.  
+**Returns**: [<code>Promise.&lt;returnUser&gt;</code>](#returnUser) - Returns a User object and a token.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -332,4 +341,28 @@ Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.
 | url | <code>string</code> | The url of the graph to be updated. |
 | query | <code>string</code> | A SPARQL INSERT/DELETE query. |
 | [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+
+<a name="User"></a>
+
+## User : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| username | <code>string</code> | 
+| email | <code>string</code> | 
+| projects | <code>Array.&lt;string&gt;</code> | 
+| uri | <code>string</code> | 
+
+<a name="returnUser"></a>
+
+## returnUser : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| user | [<code>User</code>](#User) | 
+| token | <code>string</code> | 
 
