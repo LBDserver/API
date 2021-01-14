@@ -1,5 +1,3 @@
-import * as express from 'express'
-
 interface ICreateProject {
     title: string,
     description: string,

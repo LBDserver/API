@@ -1,5 +1,3 @@
-import * as express from 'express'
-
 interface ILoginRequest {
     email: string,
     password: string
