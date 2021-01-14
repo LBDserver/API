@@ -5,7 +5,7 @@ Documentation for the LBDserver project. Includes shared interfaces as well as f
 ## Functions
 
 <dl>
-<dt><a href="#register">register(username, email, password)</a></dt>
+<dt><a href="#register">register(username, email, password)</a> ⇒ <code><a href="#returnUser">Promise.&lt;returnUser&gt;</a></code></dt>
 <dd><p>Register as a user to the local LBDserver (backend defined in process.env.REACT_APP_BACKEND).</p>
 </dd>
 <dt><a href="#login">login(email, password)</a></dt>
@@ -68,14 +68,30 @@ Documentation for the LBDserver project. Includes shared interfaces as well as f
 <dt><a href="#updateGraph">updateGraph(url, query, [token])</a></dt>
 <dd><p>Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.</p>
 </dd>
+<dt><a href="#modifyProjectUrl">modifyProjectUrl(id)</a></dt>
+<dd><p>Makes sure an url is present. If an url is already given to the function, the base of the url gets modified (for localhost usage). If not, the project url is reconstructed using the backend url (provided in the process.env.REACT_APP_BACKEND) and the project id.</p>
+</dd>
+<dt><a href="#modifyUrl">modifyUrl(url)</a></dt>
+<dd><p>Modifies the url to the backend, if the backend is running locally. Therefore, the process.env.REACT_APP_BACKEND should be defined.</p>
+</dd>
+</dl>
+
+## Typedefs
+
+<dl>
+<dt><a href="#User">User</a> : <code>Object</code></dt>
+<dd></dd>
+<dt><a href="#returnUser">returnUser</a> : <code>Object</code></dt>
+<dd></dd>
 </dl>
 
 <a name="register"></a>
 
-## register(username, email, password)
+## register(username, email, password) ⇒ [<code>Promise.&lt;returnUser&gt;</code>](#returnUser)
 Register as a user to the local LBDserver (backend defined in process.env.REACT_APP_BACKEND).
 
 **Kind**: global function
+**Returns**: [<code>Promise.&lt;returnUser&gt;</code>](#returnUser) - Returns a User object and a token.
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -333,3 +349,48 @@ Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.
 | query | <code>string</code> | A SPARQL INSERT/DELETE query. |
 | [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
 
+<a name="modifyProjectUrl"></a>
+
+## modifyProjectUrl(id)
+Makes sure an url is present. If an url is already given to the function, the base of the url gets modified (for localhost usage). If not, the project url is reconstructed using the backend url (provided in the process.env.REACT_APP_BACKEND) and the project id.
+
+**Kind**: global function
+
+| Param | Type | Description |
+| --- | --- | --- |
+| id | <code>string</code> | The project ID or original URL |
+
+<a name="modifyUrl"></a>
+
+## modifyUrl(url)
+Modifies the url to the backend, if the backend is running locally. Therefore, the process.env.REACT_APP_BACKEND should be defined.
+
+**Kind**: global function
+
+| Param |
+| --- |
+| url |
+
+<a name="User"></a>
+
+## User : <code>Object</code>
+**Kind**: global typedef
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| username | <code>string</code> |
+| email | <code>string</code> |
+| projects | <code>Array.&lt;string&gt;</code> |
+| uri | <code>string</code> |
+
+<a name="returnUser"></a>
+
+## returnUser : <code>Object</code>
+**Kind**: global typedef
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| user | [<code>User</code>](#User) |
+| token | <code>string</code> |

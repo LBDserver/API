@@ -2,10 +2,25 @@
 import * as USER from "../interfaces/userInterface";
 import * as PROJECT from '../interfaces/projectInterface';
 /**
+ *
+ * @typedef {Object} User
+ * @property {string} username
+ * @property {string} email
+ * @property {string[]} projects
+ * @property {string} uri
+ */
+/**
+ *
+ * @typedef {Object} returnUser
+ * @property {User} user
+ * @property {string} token
+ */
+/**
  * Register as a user to the local LBDserver (backend defined in process.env.REACT_APP_BACKEND).
  * @param {string} username Your username will be used to create a webID (personal URL) that can be used for access control in a Linked Data world. Should be unique.
  * @param {string} email Your e-mail address. Should be unique.
  * @param {string} password Your LBDserver passsword.
+ * @returns {Promise<returnUser>} Returns a User object and a token.
  */
 declare function register(username: string, email: string, password: string): Promise<USER.IReturnUser>;
 /**

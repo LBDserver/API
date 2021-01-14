@@ -39,12 +39,27 @@ exports.__esModule = true;
 exports.queryMultiple = exports.updateGraph = exports.queryGraphSelect = exports.queryProjectSelect = exports.deleteGraph = exports.deleteResource = exports.getGraphMetadata = exports.deleteDocument = exports.deleteProject = exports.getDocumentMetadata = exports.getOneProject = exports.getDocument = exports.uploadGraph = exports.uploadDocument = exports.createProject = exports.getUserProjects = exports.login = exports.register = exports.logout = exports.getOpenProjects = void 0;
 var axios_1 = require("axios");
 var sparqlalgebrajs_1 = require("sparqlalgebrajs");
+/**
+ *
+ * @typedef {Object} User
+ * @property {string} username
+ * @property {string} email
+ * @property {string[]} projects
+ * @property {string} uri
+ */
+/**
+ *
+ * @typedef {Object} returnUser
+ * @property {User} user
+ * @property {string} token
+ */
 //////////////////// PROJECT FUNCTIONS ////////////////////
 /**
  * Register as a user to the local LBDserver (backend defined in process.env.REACT_APP_BACKEND).
  * @param {string} username Your username will be used to create a webID (personal URL) that can be used for access control in a Linked Data world. Should be unique.
  * @param {string} email Your e-mail address. Should be unique.
  * @param {string} password Your LBDserver passsword.
+ * @returns {Promise<returnUser>} Returns a User object and a token.
  */
 function register(username, email, password) {
     return __awaiter(this, void 0, void 0, function () {

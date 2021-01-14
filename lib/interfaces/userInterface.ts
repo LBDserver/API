@@ -19,7 +19,7 @@ interface IUser {
     uri: string,
     email: string,
     password?: string,
-    tokens: string[],
+    tokens?: string[],
     projects: string[],
 }
 
