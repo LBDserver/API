@@ -7,7 +7,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "document": "node ./jsdoc_generate.js",
-    "build": "tsc",
+    "build": "tsc && npm run document",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

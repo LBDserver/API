@@ -1,4 +1,3 @@
-
 # LBDserver API
 
 Documentation for the LBDserver project. Includes shared interfaces as well as functions for communicating with the LBDserver backend.
