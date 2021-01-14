@@ -81,8 +81,7 @@ Documentation for the LBDserver project. Includes shared interfaces as well as f
 <dt><a href="#Project">Project</a> : <code>Object</code></dt>
 <dd></dd>
 <dt><a href="#QueryResults">QueryResults</a> : <code>Object</code></dt>
-<dd><p>The results of a SPARQL SELECT query.</p>
-</dd>
+<dd></dd>
 <dt><a href="#Graph">Graph</a> : <code>Object</code></dt>
 <dd></dd>
 </dl>
@@ -405,8 +404,6 @@ Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.
 <a name="QueryResults"></a>
 
 ## QueryResults : <code>Object</code>
-The results of a SPARQL SELECT query.
-
 **Kind**: global typedef  
 **Properties**
 
