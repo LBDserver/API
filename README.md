@@ -31,25 +31,25 @@ Documentation for the LBDserver project. Includes shared interfaces as well as f
 <dt><a href="#deleteResource">deleteResource(url, [token])</a> ⇒ <code>void</code></dt>
 <dd><p>Delete a resource and its metadata graph.</p>
 </dd>
-<dt><a href="#uploadDocument">uploadDocument(props, project, [token])</a> ⇒ <code>Metadata</code></dt>
+<dt><a href="#uploadDocument">uploadDocument(props, project, [token])</a> ⇒ <code><a href="#Metadata">Metadata</a></code></dt>
 <dd><p>Upload a document to a defined project. Props include a &quot;label&quot;, a &quot;description&quot; and a &quot;resource&quot;, with the &quot;resource&quot; referring to the actual file to be uploaded. The &quot;label&quot; and &quot;description&quot; are used in the automatically created metadata file, which is equal to {fileurl}.meta.</p>
 </dd>
 <dt><a href="#getDocument">getDocument(url, [token])</a> ⇒ <code>Buffer</code></dt>
 <dd><p>Get a (non RDF) document from the LBDserver by providing its URL. Authenticate with a token.</p>
 </dd>
-<dt><a href="#getDocumentMetadata">getDocumentMetadata(url, [token])</a> ⇒ <code>Metadata</code></dt>
+<dt><a href="#getDocumentMetadata">getDocumentMetadata(url, [token])</a> ⇒ <code><a href="#Metadata">Metadata</a></code></dt>
 <dd><p>Get the metadata of a document resource on the lbdserver. The url of the document should be provided; either with .meta or without (if without; the &quot;.meta&quot; suffix is automatically added).</p>
 </dd>
 <dt><a href="#deleteDocument">deleteDocument(url, [token])</a> ⇒ <code>void</code></dt>
 <dd><p>Erase a document (and its corresponding metadata graph) from existence.</p>
 </dd>
-<dt><a href="#uploadGraph">uploadGraph(props, project, [token])</a> ⇒ <code>Metadata</code></dt>
+<dt><a href="#uploadGraph">uploadGraph(props, project, [token])</a> ⇒ <code><a href="#Metadata">Metadata</a></code></dt>
 <dd><p>Upload an RDF graph to a defined project. Props include a &quot;label&quot;, a &quot;description&quot; and a &quot;resource&quot;, with the &quot;resource&quot; referring to the actual RDF graph to be uploaded. In the case no resource is passed, an empty graph gets created, using the label and description in the metadata, which is equal to {graphurl}.meta. A custom ACL graph or reference may be provided.</p>
 </dd>
 <dt><a href="#getGraph">getGraph(url, [token])</a> ⇒ <code><a href="#Graph">Graph</a></code></dt>
 <dd><p>Get a graph by its URL. You can also request metadata graphs explicitly in with this function. However, you may also use the function &quot;getGraphMetadata&quot; for this purpose.</p>
 </dd>
-<dt><a href="#getGraphMetadata">getGraphMetadata(url, [token])</a> ⇒ <code>Metadata</code></dt>
+<dt><a href="#getGraphMetadata">getGraphMetadata(url, [token])</a> ⇒ <code><a href="#Metadata">Metadata</a></code></dt>
 <dd><p>Get the metadata graph of a given graph. You may either provide the &quot;.meta&quot; suffix or skip it.</p>
 </dd>
 <dt><a href="#deleteGraph">deleteGraph(url, [token])</a> ⇒ <code>void</code></dt>
@@ -75,6 +75,8 @@ Documentation for the LBDserver project. Includes shared interfaces as well as f
 <dt><a href="#User">User</a> : <code>Object</code></dt>
 <dd></dd>
 <dt><a href="#returnUser">returnUser</a> : <code>Object</code></dt>
+<dd></dd>
+<dt><a href="#Metadata">Metadata</a> : <code>Object</code></dt>
 <dd></dd>
 <dt><a href="#Project">Project</a> : <code>Object</code></dt>
 <dd></dd>
@@ -193,7 +195,7 @@ Delete a resource and its metadata graph.
 
 <a name="uploadDocument"></a>
 
-## uploadDocument(props, project, [token]) ⇒ <code>Metadata</code>
+## uploadDocument(props, project, [token]) ⇒ [<code>Metadata</code>](#Metadata)
 Upload a document to a defined project. Props include a "label", a "description" and a "resource", with the "resource" referring to the actual file to be uploaded. The "label" and "description" are used in the automatically created metadata file, which is equal to {fileurl}.meta.
 
 **Kind**: global function  
@@ -222,7 +224,7 @@ Get a (non RDF) document from the LBDserver by providing its URL. Authenticate w
 
 <a name="getDocumentMetadata"></a>
 
-## getDocumentMetadata(url, [token]) ⇒ <code>Metadata</code>
+## getDocumentMetadata(url, [token]) ⇒ [<code>Metadata</code>](#Metadata)
 Get the metadata of a document resource on the lbdserver. The url of the document should be provided; either with .meta or without (if without; the ".meta" suffix is automatically added).
 
 **Kind**: global function  
@@ -246,7 +248,7 @@ Erase a document (and its corresponding metadata graph) from existence.
 
 <a name="uploadGraph"></a>
 
-## uploadGraph(props, project, [token]) ⇒ <code>Metadata</code>
+## uploadGraph(props, project, [token]) ⇒ [<code>Metadata</code>](#Metadata)
 Upload an RDF graph to a defined project. Props include a "label", a "description" and a "resource", with the "resource" referring to the actual RDF graph to be uploaded. In the case no resource is passed, an empty graph gets created, using the label and description in the metadata, which is equal to {graphurl}.meta. A custom ACL graph or reference may be provided.
 
 **Kind**: global function  
@@ -275,7 +277,7 @@ Get a graph by its URL. You can also request metadata graphs explicitly in with 
 
 <a name="getGraphMetadata"></a>
 
-## getGraphMetadata(url, [token]) ⇒ <code>Metadata</code>
+## getGraphMetadata(url, [token]) ⇒ [<code>Metadata</code>](#Metadata)
 Get the metadata graph of a given graph. You may either provide the ".meta" suffix or skip it.
 
 **Kind**: global function  
@@ -373,6 +375,17 @@ Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.
 | --- | --- |
 | user | [<code>User</code>](#User) | 
 | token | <code>string</code> | 
+
+<a name="Metadata"></a>
+
+## Metadata : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| uri | <code>string</code> | URI of the document |
+| metadata | <code>Object</code> | The metadata as JSON-LD. |
 
 <a name="Project"></a>
 
