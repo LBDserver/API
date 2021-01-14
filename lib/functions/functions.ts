@@ -213,7 +213,6 @@ async function getOneProject(project: string, token?: string): Promise<PROJECT.I
       response = await axios.get(url)
     }
     const data: PROJECT.IReturnProject = response.data
-    console.log('data', data)
     return data
 
   } catch (error) {
@@ -386,7 +385,6 @@ async function getDocumentMetadata(url: string, token?: string): Promise<PROJECT
     } else {
       response = await axios.get(url)
     }
-    console.log('response.data', response.data)
     return response.data
   } catch (error) {
     error.message = `Unable to fetch document metadata; ${error.message}`
@@ -553,7 +551,6 @@ async function queryProjectSelect(project: string, query: string, token?: string
   try {
     let url = modifyProjectUrl(project)
     url = url + "?query=" + query.toString()
-    console.log('url', url)
     let response: AXIOS.AxiosResponse
     if (token) {
       const config = {
@@ -603,11 +600,9 @@ async function queryMultiple(project: string, query: string, graphs: string[], t
       named: []
     }
     query = toSparql(newAlgebra)
-    console.log('query', query)
 
     let url = modifyProjectUrl(project)
     url = url + "?query=" + encodeURIComponent(query.toString())
-    console.log('url', url)
     let response: AXIOS.AxiosResponse
     if (token) {
       const config = {
@@ -639,7 +634,6 @@ async function queryGraphSelect(url: string, query: string, token?: string): Pro
   try {
     url = modifyUrl(url)
     url = url + "?query=" + query.toString()
-    console.log('url', url)
     let response: AXIOS.AxiosResponse
     if (token) {
       const config = {
@@ -664,7 +658,6 @@ async function updateProject(project: string, query: string, token?: string): Pr
   try {
     let url = modifyProjectUrl(project)
     url = url + "?update=" + encodeURIComponent(query.toString())
-    console.log(url)
     let response: AXIOS.AxiosResponse
     if (token) {
       const config = {
@@ -693,14 +686,12 @@ async function updateProject(project: string, query: string, token?: string): Pr
  */
 async function updateGraph(url: string, query: string, token?: string): Promise<void> {
   try {
-    console.log('url', url)
     // get project id from url
     const urlProps = new URL(url)
     const project = urlProps.pathname.split("/")[2]
 
     // change query
     const algebra = translate(query, { quads: true })
-    console.log('algebra', algebra)
     for (const key of Object.keys(algebra)) {
       switch (key) {
         case 'delete':
