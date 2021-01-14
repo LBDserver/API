@@ -1,11 +1,11 @@
+
 # LBDserver API
 
 Documentation for the LBDserver project. Includes shared interfaces as well as functions for communicating with the LBDserver backend.
-
 ## Functions
 
 <dl>
-<dt><a href="#register">register(username, email, password)</a> ⇒ <code><a href="#returnUser">Promise.&lt;returnUser&gt;</a></code></dt>
+<dt><a href="#register">register(username, email, password)</a> ⇒ <code>Promise.&lt;returnUser&gt;</code></dt>
 <dd><p>Register as a user to the local LBDserver (backend defined in process.env.REACT_APP_BACKEND).</p>
 </dd>
 <dt><a href="#login">login(email, password)</a></dt>
@@ -68,30 +68,15 @@ Documentation for the LBDserver project. Includes shared interfaces as well as f
 <dt><a href="#updateGraph">updateGraph(url, query, [token])</a></dt>
 <dd><p>Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.</p>
 </dd>
-<dt><a href="#modifyProjectUrl">modifyProjectUrl(id)</a></dt>
-<dd><p>Makes sure an url is present. If an url is already given to the function, the base of the url gets modified (for localhost usage). If not, the project url is reconstructed using the backend url (provided in the process.env.REACT_APP_BACKEND) and the project id.</p>
-</dd>
-<dt><a href="#modifyUrl">modifyUrl(url)</a></dt>
-<dd><p>Modifies the url to the backend, if the backend is running locally. Therefore, the process.env.REACT_APP_BACKEND should be defined.</p>
-</dd>
-</dl>
-
-## Typedefs
-
-<dl>
-<dt><a href="#User">User</a> : <code>Object</code></dt>
-<dd></dd>
-<dt><a href="#returnUser">returnUser</a> : <code>Object</code></dt>
-<dd></dd>
 </dl>
 
 <a name="register"></a>
 
-## register(username, email, password) ⇒ [<code>Promise.&lt;returnUser&gt;</code>](#returnUser)
+## register(username, email, password) ⇒ <code>Promise.&lt;returnUser&gt;</code>
 Register as a user to the local LBDserver (backend defined in process.env.REACT_APP_BACKEND).
 
-**Kind**: global function
-**Returns**: [<code>Promise.&lt;returnUser&gt;</code>](#returnUser) - Returns a User object and a token.
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;returnUser&gt;</code> - Returns a User object and a token.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -104,7 +89,7 @@ Register as a user to the local LBDserver (backend defined in process.env.REACT_
 ## login(email, password)
 Login as an existing user to the LBDserver (backend defined in process.env.REACT_APP_BACKEND)
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -116,7 +101,7 @@ Login as an existing user to the LBDserver (backend defined in process.env.REACT
 ## logout(token)
 Log out on the LBDserver (backend defined in process.env.REACT_APP_BACKEND)
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -127,13 +112,13 @@ Log out on the LBDserver (backend defined in process.env.REACT_APP_BACKEND)
 ## getOpenProjects()
 Get all the documents accessible to unauthenticated users (public projects) on the local LBDserver (backend defined in process.env.REACT_APP_BACKEND)
 
-**Kind**: global function
+**Kind**: global function  
 <a name="getUserProjects"></a>
 
 ## getUserProjects(token)
 Get all the projects associated with the currently authenticated user.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -144,7 +129,7 @@ Get all the projects associated with the currently authenticated user.
 ## createProject(project, [token])
 Create a new project on the local LBDserver
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -159,7 +144,7 @@ Create a new project on the local LBDserver
 ## getOneProject(project, [token])
 Get a project by its URL or ID. If an ID is given, the URL is reconstructed via the backend URL defined in process.env.REACT_APP_BACKEND.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -171,7 +156,7 @@ Get a project by its URL or ID. If an ID is given, the URL is reconstructed via 
 ## deleteProject(project, [token])
 Delete a project by ID or URL. If an ID is provided; the URL is reconstructed based on the backend URL defined in process.env.REACT_APP_BACKEND.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -183,7 +168,7 @@ Delete a project by ID or URL. If an ID is provided; the URL is reconstructed ba
 ## deleteResource(url, [token])
 Delete a resource and its metadata graph.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -195,7 +180,7 @@ Delete a resource and its metadata graph.
 ## uploadDocument(props, project, [token])
 Upload a document to a defined project. Props include a "label", a "description" and a "resource", with the "resource" referring to the actual file to be uploaded. The "label" and "description" are used in the automatically created metadata file, which is equal to {fileurl}.meta.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -212,7 +197,7 @@ Upload a document to a defined project. Props include a "label", a "description"
 ## getDocument(url, [token])
 Get a (non RDF) document from the LBDserver by providing its URL. Authenticate with a token.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -224,7 +209,7 @@ Get a (non RDF) document from the LBDserver by providing its URL. Authenticate w
 ## getDocumentMetadata(url, [token])
 Get the metadata of a document resource on the lbdserver. The url of the document should be provided; either with .meta or without (if without; the ".meta" suffix is automatically added).
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -236,7 +221,7 @@ Get the metadata of a document resource on the lbdserver. The url of the documen
 ## deleteDocument(url, [token])
 Erase a document (and its corresponding metadata graph) from existence.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -248,7 +233,7 @@ Erase a document (and its corresponding metadata graph) from existence.
 ## uploadGraph(props, project, [token])
 Upload an RDF graph to a defined project. Props include a "label", a "description" and a "resource", with the "resource" referring to the actual RDF graph to be uploaded. In the case no resource is passed, an empty graph gets created, using the label and description in the metadata, which is equal to {graphurl}.meta. A custom ACL graph or reference may be provided.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -265,7 +250,7 @@ Upload an RDF graph to a defined project. Props include a "label", a "descriptio
 ## getGraph(url, [token])
 Get a graph by its URL. You can also request metadata graphs explicitly in with this function. However, you may also use the function "getGraphMetadata" for this purpose.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -277,7 +262,7 @@ Get a graph by its URL. You can also request metadata graphs explicitly in with 
 ## getGraphMetadata(url, [token])
 Get the metadata graph of a given graph. You may either provide the ".meta" suffix or skip it.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -289,7 +274,7 @@ Get the metadata graph of a given graph. You may either provide the ".meta" suff
 ## deleteGraph(url, [token])
 Erase a project graph and its corresponding metadata graph from existence.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -301,7 +286,7 @@ Erase a project graph and its corresponding metadata graph from existence.
 ## queryProjectSelect(project, query, [token])
 Query a project with SPARQL SELECT. Only the graphs to which the user has access will be queried.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -314,7 +299,7 @@ Query a project with SPARQL SELECT. Only the graphs to which the user has access
 ## queryMultiple(project, query, graphs, [token])
 Query multiple graphs with SPARQL SELECT.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -328,7 +313,7 @@ Query multiple graphs with SPARQL SELECT.
 ## queryGraphSelect(url, query, [token])
 Query a graph with SPARQL SELECT.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -341,7 +326,7 @@ Query a graph with SPARQL SELECT.
 ## updateGraph(url, query, [token])
 Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.
 
-**Kind**: global function
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -349,45 +334,3 @@ Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.
 | query | <code>string</code> | A SPARQL INSERT/DELETE query. |
 | [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
 
-<a name="modifyProjectUrl"></a>
-
-## modifyProjectUrl(id)
-Makes sure an url is present. If an url is already given to the function, the base of the url gets modified (for localhost usage). If not, the project url is reconstructed using the backend url (provided in the process.env.REACT_APP_BACKEND) and the project id.
-
-**Kind**: global function
-
-| Param | Type | Description |
-| --- | --- | --- |
-| id | <code>string</code> | The project ID or original URL |
-
-<a name="modifyUrl"></a>
-
-## modifyUrl(url)
-Modifies the url to the backend, if the backend is running locally. Therefore, the process.env.REACT_APP_BACKEND should be defined.
-
-**Kind**: global function
-
-| Param |
-| --- |
-| url |
-
-<a name="User"></a>
-
-## User : <code>Object</code>
-**Kind**: global typedef
-**Properties**
-
-| Name | Type |
-| --- | --- |
-| username | <code>string</code> |
-| email | <code>string</code> |
-| projects | <code>Array.&lt;string&gt;</code> |
-| uri | <code>string</code> |
-
-## returnUser : <code>Object</code>
-**Properties**
-
-| Name | Type |
-| --- | --- |
-| user | [<code>User</code>](#User) |
-| token | <code>string</code> |

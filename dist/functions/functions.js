@@ -41,7 +41,7 @@ var axios_1 = require("axios");
 var sparqlalgebrajs_1 = require("sparqlalgebrajs");
 /**
  *
- * @typedef {Object} User
+ * @class {Object} User
  * @property {string} username
  * @property {string} email
  * @property {string[]} projects
@@ -49,7 +49,7 @@ var sparqlalgebrajs_1 = require("sparqlalgebrajs");
  */
 /**
  *
- * @typedef {Object} returnUser
+ * @class {Object} returnUser
  * @property {User} user
  * @property {string} token
  */
@@ -920,10 +920,6 @@ function updateGraph(url, query, token) {
 }
 exports.updateGraph = updateGraph;
 ///////////////// HELPER FUNCTIONS ///////////////
-/**
- * Makes sure an url is present. If an url is already given to the function, the base of the url gets modified (for localhost usage). If not, the project url is reconstructed using the backend url (provided in the process.env.REACT_APP_BACKEND) and the project id.
- * @param {string} id The project ID or original URL
- */
 function modifyProjectUrl(id) {
     var url;
     try {
@@ -934,10 +930,6 @@ function modifyProjectUrl(id) {
     }
     return url;
 }
-/**
- * Modifies the url to the backend, if the backend is running locally. Therefore, the process.env.REACT_APP_BACKEND should be defined.
- * @param url
- */
 function modifyUrl(url) {
     try {
         var fullUrl = new URL(url);
