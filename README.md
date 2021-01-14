@@ -18,61 +18,61 @@ $ npm install lbd-server
 <dt><a href="#login">login(email, password)</a> ⇒ <code><a href="#returnUser">Promise.&lt;returnUser&gt;</a></code></dt>
 <dd><p>Login as an existing user to the LBDserver (backend defined in process.env.REACT_APP_BACKEND)</p>
 </dd>
-<dt><a href="#logout">logout(token)</a> ⇒ <code>void</code></dt>
+<dt><a href="#logout">logout(token)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
 <dd><p>Log out on the LBDserver (backend defined in process.env.REACT_APP_BACKEND)</p>
 </dd>
-<dt><a href="#getOpenProjects">getOpenProjects()</a> ⇒ <code><a href="#Project">Array.&lt;Project&gt;</a></code></dt>
+<dt><a href="#getOpenProjects">getOpenProjects()</a> ⇒ <code>Promise.&lt;Array.&lt;Project&gt;&gt;</code></dt>
 <dd><p>Get all the documents accessible to unauthenticated users (public projects) on the local LBDserver (backend defined in process.env.REACT_APP_BACKEND)</p>
 </dd>
-<dt><a href="#getUserProjects">getUserProjects(token)</a> ⇒ <code><a href="#Project">Array.&lt;Project&gt;</a></code></dt>
+<dt><a href="#getUserProjects">getUserProjects(token)</a> ⇒ <code>Promise.&lt;Array.&lt;Project&gt;&gt;</code></dt>
 <dd><p>Get all the projects associated with the currently authenticated user.</p>
 </dd>
-<dt><a href="#createProject">createProject(project, [token])</a> ⇒ <code><a href="#Project">Project</a></code></dt>
+<dt><a href="#createProject">createProject(project, [token])</a> ⇒ <code><a href="#Project">Promise.&lt;Project&gt;</a></code></dt>
 <dd><p>Create a new project on the local LBDserver</p>
 </dd>
-<dt><a href="#getOneProject">getOneProject(project, [token])</a> ⇒ <code><a href="#Project">Project</a></code></dt>
+<dt><a href="#getOneProject">getOneProject(project, [token])</a> ⇒ <code><a href="#Project">Promise.&lt;Project&gt;</a></code></dt>
 <dd><p>Get a project by its URL or ID. If an ID is given, the URL is reconstructed via the backend URL defined in process.env.REACT_APP_BACKEND.</p>
 </dd>
-<dt><a href="#deleteProject">deleteProject(project, [token])</a> ⇒ <code>void</code></dt>
+<dt><a href="#deleteProject">deleteProject(project, [token])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
 <dd><p>Delete a project by ID or URL. If an ID is provided; the URL is reconstructed based on the backend URL defined in process.env.REACT_APP_BACKEND.</p>
 </dd>
-<dt><a href="#deleteResource">deleteResource(url, [token])</a> ⇒ <code>void</code></dt>
+<dt><a href="#deleteResource">deleteResource(url, [token])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
 <dd><p>Delete a resource and its metadata graph.</p>
 </dd>
-<dt><a href="#uploadDocument">uploadDocument(props, project, [token])</a> ⇒ <code><a href="#Metadata">Metadata</a></code></dt>
+<dt><a href="#uploadDocument">uploadDocument(props, project, [token])</a> ⇒ <code><a href="#Metadata">Promise.&lt;Metadata&gt;</a></code></dt>
 <dd><p>Upload a document to a defined project. Props include a &quot;label&quot;, a &quot;description&quot; and a &quot;resource&quot;, with the &quot;resource&quot; referring to the actual file to be uploaded. The &quot;label&quot; and &quot;description&quot; are used in the automatically created metadata file, which is equal to {fileurl}.meta.</p>
 </dd>
-<dt><a href="#getDocument">getDocument(url, [token])</a> ⇒ <code>Buffer</code></dt>
+<dt><a href="#getDocument">getDocument(url, [token])</a> ⇒ <code>Promise.&lt;Buffer&gt;</code></dt>
 <dd><p>Get a (non RDF) document from the LBDserver by providing its URL. Authenticate with a token.</p>
 </dd>
-<dt><a href="#getDocumentMetadata">getDocumentMetadata(url, [token])</a> ⇒ <code><a href="#Metadata">Metadata</a></code></dt>
+<dt><a href="#getDocumentMetadata">getDocumentMetadata(url, [token])</a> ⇒ <code><a href="#Metadata">Promise.&lt;Metadata&gt;</a></code></dt>
 <dd><p>Get the metadata of a document resource on the lbdserver. The url of the document should be provided; either with .meta or without (if without; the &quot;.meta&quot; suffix is automatically added).</p>
 </dd>
-<dt><a href="#deleteDocument">deleteDocument(url, [token])</a> ⇒ <code>void</code></dt>
+<dt><a href="#deleteDocument">deleteDocument(url, [token])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
 <dd><p>Erase a document (and its corresponding metadata graph) from existence.</p>
 </dd>
-<dt><a href="#uploadGraph">uploadGraph(props, project, [token])</a> ⇒ <code><a href="#Metadata">Metadata</a></code></dt>
+<dt><a href="#uploadGraph">uploadGraph(props, project, [token])</a> ⇒ <code><a href="#Metadata">Promise.&lt;Metadata&gt;</a></code></dt>
 <dd><p>Upload an RDF graph to a defined project. Props include a &quot;label&quot;, a &quot;description&quot; and a &quot;resource&quot;, with the &quot;resource&quot; referring to the actual RDF graph to be uploaded. In the case no resource is passed, an empty graph gets created, using the label and description in the metadata, which is equal to {graphurl}.meta. A custom ACL graph or reference may be provided.</p>
 </dd>
-<dt><a href="#getGraph">getGraph(url, [token])</a> ⇒ <code><a href="#Graph">Graph</a></code></dt>
+<dt><a href="#getGraph">getGraph(url, [token])</a> ⇒ <code><a href="#Graph">Promise.&lt;Graph&gt;</a></code></dt>
 <dd><p>Get a graph by its URL. You can also request metadata graphs explicitly in with this function. However, you may also use the function &quot;getGraphMetadata&quot; for this purpose.</p>
 </dd>
-<dt><a href="#getGraphMetadata">getGraphMetadata(url, [token])</a> ⇒ <code><a href="#Metadata">Metadata</a></code></dt>
+<dt><a href="#getGraphMetadata">getGraphMetadata(url, [token])</a> ⇒ <code><a href="#Metadata">Promise.&lt;Metadata&gt;</a></code></dt>
 <dd><p>Get the metadata graph of a given graph. You may either provide the &quot;.meta&quot; suffix or skip it.</p>
 </dd>
-<dt><a href="#deleteGraph">deleteGraph(url, [token])</a> ⇒ <code>void</code></dt>
+<dt><a href="#deleteGraph">deleteGraph(url, [token])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
 <dd><p>Erase a project graph and its corresponding metadata graph from existence.</p>
 </dd>
-<dt><a href="#queryProjectSelect">queryProjectSelect(project, query, [token])</a> ⇒ <code><a href="#QueryResults">QueryResults</a></code></dt>
+<dt><a href="#queryProjectSelect">queryProjectSelect(project, query, [token])</a> ⇒ <code><a href="#QueryResults">Promise.&lt;QueryResults&gt;</a></code></dt>
 <dd><p>Query a project with SPARQL SELECT. Only the graphs to which the user has access will be queried.</p>
 </dd>
-<dt><a href="#queryMultiple">queryMultiple(project, query, graphs, [token])</a> ⇒ <code><a href="#QueryResults">QueryResults</a></code></dt>
+<dt><a href="#queryMultiple">queryMultiple(project, query, graphs, [token])</a> ⇒ <code><a href="#QueryResults">Promise.&lt;QueryResults&gt;</a></code></dt>
 <dd><p>Query multiple graphs with SPARQL SELECT.</p>
 </dd>
 <dt><a href="#queryGraphSelect">queryGraphSelect(url, query, [token])</a> ⇒ <code><a href="#QueryResults">QueryResults</a></code></dt>
 <dd><p>Query a graph with SPARQL SELECT.</p>
 </dd>
-<dt><a href="#updateGraph">updateGraph(url, query, [token])</a> ⇒ <code>void</code></dt>
+<dt><a href="#updateGraph">updateGraph(url, query, [token])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
 <dd><p>Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.</p>
 </dd>
 </dl>
@@ -123,7 +123,7 @@ Login as an existing user to the LBDserver (backend defined in process.env.REACT
 
 <a name="logout"></a>
 
-## logout(token) ⇒ <code>void</code>
+## logout(token) ⇒ <code>Promise.&lt;void&gt;</code>
 Log out on the LBDserver (backend defined in process.env.REACT_APP_BACKEND)
 
 **Kind**: global function  
@@ -134,13 +134,13 @@ Log out on the LBDserver (backend defined in process.env.REACT_APP_BACKEND)
 
 <a name="getOpenProjects"></a>
 
-## getOpenProjects() ⇒ [<code>Array.&lt;Project&gt;</code>](#Project)
+## getOpenProjects() ⇒ <code>Promise.&lt;Array.&lt;Project&gt;&gt;</code>
 Get all the documents accessible to unauthenticated users (public projects) on the local LBDserver (backend defined in process.env.REACT_APP_BACKEND)
 
 **Kind**: global function  
 <a name="getUserProjects"></a>
 
-## getUserProjects(token) ⇒ [<code>Array.&lt;Project&gt;</code>](#Project)
+## getUserProjects(token) ⇒ <code>Promise.&lt;Array.&lt;Project&gt;&gt;</code>
 Get all the projects associated with the currently authenticated user.
 
 **Kind**: global function  
@@ -151,7 +151,7 @@ Get all the projects associated with the currently authenticated user.
 
 <a name="createProject"></a>
 
-## createProject(project, [token]) ⇒ [<code>Project</code>](#Project)
+## createProject(project, [token]) ⇒ [<code>Promise.&lt;Project&gt;</code>](#Project)
 Create a new project on the local LBDserver
 
 **Kind**: global function  
@@ -166,7 +166,7 @@ Create a new project on the local LBDserver
 
 <a name="getOneProject"></a>
 
-## getOneProject(project, [token]) ⇒ [<code>Project</code>](#Project)
+## getOneProject(project, [token]) ⇒ [<code>Promise.&lt;Project&gt;</code>](#Project)
 Get a project by its URL or ID. If an ID is given, the URL is reconstructed via the backend URL defined in process.env.REACT_APP_BACKEND.
 
 **Kind**: global function  
@@ -178,7 +178,7 @@ Get a project by its URL or ID. If an ID is given, the URL is reconstructed via 
 
 <a name="deleteProject"></a>
 
-## deleteProject(project, [token]) ⇒ <code>void</code>
+## deleteProject(project, [token]) ⇒ <code>Promise.&lt;void&gt;</code>
 Delete a project by ID or URL. If an ID is provided; the URL is reconstructed based on the backend URL defined in process.env.REACT_APP_BACKEND.
 
 **Kind**: global function  
@@ -190,7 +190,7 @@ Delete a project by ID or URL. If an ID is provided; the URL is reconstructed ba
 
 <a name="deleteResource"></a>
 
-## deleteResource(url, [token]) ⇒ <code>void</code>
+## deleteResource(url, [token]) ⇒ <code>Promise.&lt;void&gt;</code>
 Delete a resource and its metadata graph.
 
 **Kind**: global function  
@@ -202,7 +202,7 @@ Delete a resource and its metadata graph.
 
 <a name="uploadDocument"></a>
 
-## uploadDocument(props, project, [token]) ⇒ [<code>Metadata</code>](#Metadata)
+## uploadDocument(props, project, [token]) ⇒ [<code>Promise.&lt;Metadata&gt;</code>](#Metadata)
 Upload a document to a defined project. Props include a "label", a "description" and a "resource", with the "resource" referring to the actual file to be uploaded. The "label" and "description" are used in the automatically created metadata file, which is equal to {fileurl}.meta.
 
 **Kind**: global function  
@@ -219,7 +219,7 @@ Upload a document to a defined project. Props include a "label", a "description"
 
 <a name="getDocument"></a>
 
-## getDocument(url, [token]) ⇒ <code>Buffer</code>
+## getDocument(url, [token]) ⇒ <code>Promise.&lt;Buffer&gt;</code>
 Get a (non RDF) document from the LBDserver by providing its URL. Authenticate with a token.
 
 **Kind**: global function  
@@ -231,7 +231,7 @@ Get a (non RDF) document from the LBDserver by providing its URL. Authenticate w
 
 <a name="getDocumentMetadata"></a>
 
-## getDocumentMetadata(url, [token]) ⇒ [<code>Metadata</code>](#Metadata)
+## getDocumentMetadata(url, [token]) ⇒ [<code>Promise.&lt;Metadata&gt;</code>](#Metadata)
 Get the metadata of a document resource on the lbdserver. The url of the document should be provided; either with .meta or without (if without; the ".meta" suffix is automatically added).
 
 **Kind**: global function  
@@ -243,7 +243,7 @@ Get the metadata of a document resource on the lbdserver. The url of the documen
 
 <a name="deleteDocument"></a>
 
-## deleteDocument(url, [token]) ⇒ <code>void</code>
+## deleteDocument(url, [token]) ⇒ <code>Promise.&lt;void&gt;</code>
 Erase a document (and its corresponding metadata graph) from existence.
 
 **Kind**: global function  
@@ -255,7 +255,7 @@ Erase a document (and its corresponding metadata graph) from existence.
 
 <a name="uploadGraph"></a>
 
-## uploadGraph(props, project, [token]) ⇒ [<code>Metadata</code>](#Metadata)
+## uploadGraph(props, project, [token]) ⇒ [<code>Promise.&lt;Metadata&gt;</code>](#Metadata)
 Upload an RDF graph to a defined project. Props include a "label", a "description" and a "resource", with the "resource" referring to the actual RDF graph to be uploaded. In the case no resource is passed, an empty graph gets created, using the label and description in the metadata, which is equal to {graphurl}.meta. A custom ACL graph or reference may be provided.
 
 **Kind**: global function  
@@ -272,7 +272,7 @@ Upload an RDF graph to a defined project. Props include a "label", a "descriptio
 
 <a name="getGraph"></a>
 
-## getGraph(url, [token]) ⇒ [<code>Graph</code>](#Graph)
+## getGraph(url, [token]) ⇒ [<code>Promise.&lt;Graph&gt;</code>](#Graph)
 Get a graph by its URL. You can also request metadata graphs explicitly in with this function. However, you may also use the function "getGraphMetadata" for this purpose.
 
 **Kind**: global function  
@@ -284,7 +284,7 @@ Get a graph by its URL. You can also request metadata graphs explicitly in with 
 
 <a name="getGraphMetadata"></a>
 
-## getGraphMetadata(url, [token]) ⇒ [<code>Metadata</code>](#Metadata)
+## getGraphMetadata(url, [token]) ⇒ [<code>Promise.&lt;Metadata&gt;</code>](#Metadata)
 Get the metadata graph of a given graph. You may either provide the ".meta" suffix or skip it.
 
 **Kind**: global function  
@@ -296,7 +296,7 @@ Get the metadata graph of a given graph. You may either provide the ".meta" suff
 
 <a name="deleteGraph"></a>
 
-## deleteGraph(url, [token]) ⇒ <code>void</code>
+## deleteGraph(url, [token]) ⇒ <code>Promise.&lt;void&gt;</code>
 Erase a project graph and its corresponding metadata graph from existence.
 
 **Kind**: global function  
@@ -308,7 +308,7 @@ Erase a project graph and its corresponding metadata graph from existence.
 
 <a name="queryProjectSelect"></a>
 
-## queryProjectSelect(project, query, [token]) ⇒ [<code>QueryResults</code>](#QueryResults)
+## queryProjectSelect(project, query, [token]) ⇒ [<code>Promise.&lt;QueryResults&gt;</code>](#QueryResults)
 Query a project with SPARQL SELECT. Only the graphs to which the user has access will be queried.
 
 **Kind**: global function  
@@ -321,7 +321,7 @@ Query a project with SPARQL SELECT. Only the graphs to which the user has access
 
 <a name="queryMultiple"></a>
 
-## queryMultiple(project, query, graphs, [token]) ⇒ [<code>QueryResults</code>](#QueryResults)
+## queryMultiple(project, query, graphs, [token]) ⇒ [<code>Promise.&lt;QueryResults&gt;</code>](#QueryResults)
 Query multiple graphs with SPARQL SELECT.
 
 **Kind**: global function  
@@ -348,7 +348,7 @@ Query a graph with SPARQL SELECT.
 
 <a name="updateGraph"></a>
 
-## updateGraph(url, query, [token]) ⇒ <code>void</code>
+## updateGraph(url, query, [token]) ⇒ <code>Promise.&lt;void&gt;</code>
 Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.
 
 **Kind**: global function  
