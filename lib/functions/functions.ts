@@ -72,7 +72,7 @@ async function login(email: string, password: string): Promise<USER.IReturnUser>
 /**
  * Log out on the LBDserver (backend defined in process.env.REACT_APP_BACKEND)
  * @param {string} token The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 async function logout(token: string): Promise<void> {
   try {
@@ -122,7 +122,7 @@ async function logout(token: string): Promise<void> {
 //////////////////// PROJECT FUNCTIONS ////////////////////
 /**
  * Get all the documents accessible to unauthenticated users (public projects) on the local LBDserver (backend defined in process.env.REACT_APP_BACKEND)
- * @returns {Project[]}
+ * @returns {Promise<Project[]>}
  */
 async function getOpenProjects(): Promise<PROJECT.IReturnProject[]> {
   try {
@@ -138,7 +138,7 @@ async function getOpenProjects(): Promise<PROJECT.IReturnProject[]> {
 /**
  * Get all the projects associated with the currently authenticated user.
  * @param {string} token The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Project[]}
+ * @returns {Promise<Project[]>}
  */
 async function getUserProjects(token: string): Promise<PROJECT.IReturnProject[]> {
   try {
@@ -168,7 +168,7 @@ async function getUserProjects(token: string): Promise<PROJECT.IReturnProject[]>
  * @param {string} project.description A small description of the project. It will be registered in the project metadata graph as rdfs:comment.
  * @param {boolean} project.open Whether the project should be visible for the broader public or only for the creator. This is registered within the default ACL file (which can be changed afterwards as well).
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Project}
+ * @returns {Promise<Project>}
  */
 async function createProject(project: PROJECT.ICreateProject, token?: string): Promise<PROJECT.IReturnProject> {
   try {
@@ -196,7 +196,7 @@ async function createProject(project: PROJECT.ICreateProject, token?: string): P
  * Get a project by its URL or ID. If an ID is given, the URL is reconstructed via the backend URL defined in process.env.REACT_APP_BACKEND.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. Optional.
- * @returns {Project}
+ * @returns {Promise<Project>}
  */
 async function getOneProject(project: string, token?: string): Promise<PROJECT.IReturnProject> {
   try {
@@ -226,7 +226,7 @@ async function getOneProject(project: string, token?: string): Promise<PROJECT.I
  * Delete a project by ID or URL. If an ID is provided; the URL is reconstructed based on the backend URL defined in process.env.REACT_APP_BACKEND.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 async function deleteProject(project: string, token?: string): Promise<void> {
   try {
@@ -253,7 +253,7 @@ async function deleteProject(project: string, token?: string): Promise<void> {
  * Delete a resource and its metadata graph.
  * @param {string} url The url of the resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 async function deleteResource(url: string, token?: string): Promise<void> {
   try {
@@ -293,7 +293,7 @@ interface IUploadResource {
  * @param {string|Blob} [props.acl] An optional parameter to indicate the ACL graph for the resource. Can be a string pointing at the URL of an already existing ACL graph or a new ACL graph, uploaded via a HTMLInputElement.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 async function uploadDocument(props: IUploadResource, project: string, token?: string): Promise<PROJECT.IReturnMetadata> {
   try {
@@ -335,7 +335,7 @@ async function uploadDocument(props: IUploadResource, project: string, token?: s
  * Get a (non RDF) document from the LBDserver by providing its URL. Authenticate with a token.
  * @param {string} url The URL of the requested resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Buffer}
+ * @returns {Promise<Buffer>}
  */
 async function getDocument(url: string, token?: string): Promise<Buffer> {
   try {
@@ -365,7 +365,7 @@ async function getDocument(url: string, token?: string): Promise<Buffer> {
  * Get the metadata of a document resource on the lbdserver. The url of the document should be provided; either with .meta or without (if without; the ".meta" suffix is automatically added).
  * @param {string} url The URL of the requested resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 async function getDocumentMetadata(url: string, token?: string): Promise<PROJECT.IReturnMetadata> {
   try {
@@ -398,7 +398,7 @@ async function getDocumentMetadata(url: string, token?: string): Promise<PROJECT
  * Erase a document (and its corresponding metadata graph) from existence. 
  * @param {string} url The URL of the resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 async function deleteDocument(url: string, token?: string): Promise<void> {
   try {
@@ -427,7 +427,7 @@ async function deleteDocument(url: string, token?: string): Promise<void> {
  * @param {string|Blob} [props.acl] An optional parameter to indicate the ACL graph for the resource. Can be a string pointing at the URL of an already existing ACL graph or a new ACL graph, uploaded via a HTMLInputElement.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 async function uploadGraph(props: IUploadResource, project: string, token?: string): Promise<PROJECT.IReturnMetadata> {
   try {
@@ -469,7 +469,7 @@ async function uploadGraph(props: IUploadResource, project: string, token?: stri
  * Get a graph by its URL. You can also request metadata graphs explicitly in with this function. However, you may also use the function "getGraphMetadata" for this purpose.
  * @param {string} url The URL of the requested resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Graph}
+ * @returns {Promise<Graph>}
  */
 async function getGraph(url: string, token?: string): Promise<PROJECT.IReturnGraph> {
   try {
@@ -499,7 +499,7 @@ async function getGraph(url: string, token?: string): Promise<PROJECT.IReturnGra
  * Get the metadata graph of a given graph. You may either provide the ".meta" suffix or skip it. 
  * @param {string} url The URL of the resource corresponding with the metadata graph or the URL of the metadata graph itself.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 async function getGraphMetadata(url: string, token?: string): Promise<PROJECT.IReturnMetadata> {
   try {
@@ -519,7 +519,7 @@ async function getGraphMetadata(url: string, token?: string): Promise<PROJECT.IR
  * Erase a project graph and its corresponding metadata graph from existence.
  * @param {string} url The URL of the resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 async function deleteGraph(url: string, token?: string): Promise<void> {
   try {
@@ -536,7 +536,7 @@ async function deleteGraph(url: string, token?: string): Promise<void> {
  * @param {string} project The URL or the ID of the project.
  * @param {string} query A SPARQL select query.  
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {QueryResults}
+ * @returns {Promise<QueryResults>}
  */
 async function queryProjectSelect(project: string, query: string, token?: string): Promise<PROJECT.IQueryResults> {
   try {
@@ -574,7 +574,7 @@ interface rdfNode {
  * @param {string} query A SPARQL select query.  
  * @param {string[]} graphs An array of the graphs that are to be included in the query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {QueryResults}
+ * @returns {Promise<QueryResults>}
  */
 async function queryMultiple(project: string, query: string, graphs: string[], token?: string): Promise<PROJECT.IQueryResults> {
   try {
@@ -678,7 +678,7 @@ async function updateProject(project: string, query: string, token?: string): Pr
  * @param {string} url The url of the graph to be updated.
  * @param {string} query A SPARQL INSERT/DELETE query.  
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 async function updateGraph(url: string, query: string, token?: string): Promise<void> {
   try {

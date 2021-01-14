@@ -4,6 +4,14 @@ const fs = require('fs')
 const readmeText = `# LBDserver API
 
 Documentation for the LBDserver project. Includes shared interfaces as well as functions for communicating with the LBDserver backend.
+
+## Installation
+
+Install the package with NPM:
+
+\`\`\`bash
+$ npm install lbd-server
+\`\`\`
 `
 
 try {
