@@ -124,7 +124,7 @@ exports.login = login;
 /**
  * Log out on the LBDserver (backend defined in process.env.REACT_APP_BACKEND)
  * @param {string} token The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 function logout(token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -181,7 +181,7 @@ exports.logout = logout;
 //////////////////// PROJECT FUNCTIONS ////////////////////
 /**
  * Get all the documents accessible to unauthenticated users (public projects) on the local LBDserver (backend defined in process.env.REACT_APP_BACKEND)
- * @returns {Project[]}
+ * @returns {Promise<Project[]>}
  */
 function getOpenProjects() {
     return __awaiter(this, void 0, void 0, function () {
@@ -208,7 +208,7 @@ exports.getOpenProjects = getOpenProjects;
 /**
  * Get all the projects associated with the currently authenticated user.
  * @param {string} token The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Project[]}
+ * @returns {Promise<Project[]>}
  */
 function getUserProjects(token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -247,7 +247,7 @@ exports.getUserProjects = getUserProjects;
  * @param {string} project.description A small description of the project. It will be registered in the project metadata graph as rdfs:comment.
  * @param {boolean} project.open Whether the project should be visible for the broader public or only for the creator. This is registered within the default ACL file (which can be changed afterwards as well).
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Project}
+ * @returns {Promise<Project>}
  */
 function createProject(project, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -284,7 +284,7 @@ exports.createProject = createProject;
  * Get a project by its URL or ID. If an ID is given, the URL is reconstructed via the backend URL defined in process.env.REACT_APP_BACKEND.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. Optional.
- * @returns {Project}
+ * @returns {Promise<Project>}
  */
 function getOneProject(project, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -327,7 +327,7 @@ exports.getOneProject = getOneProject;
  * Delete a project by ID or URL. If an ID is provided; the URL is reconstructed based on the backend URL defined in process.env.REACT_APP_BACKEND.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 function deleteProject(project, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -367,7 +367,7 @@ exports.deleteProject = deleteProject;
  * Delete a resource and its metadata graph.
  * @param {string} url The url of the resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 function deleteResource(url, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -412,7 +412,7 @@ exports.deleteResource = deleteResource;
  * @param {string|Blob} [props.acl] An optional parameter to indicate the ACL graph for the resource. Can be a string pointing at the URL of an already existing ACL graph or a new ACL graph, uploaded via a HTMLInputElement.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 function uploadDocument(props, project, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -461,7 +461,7 @@ exports.uploadDocument = uploadDocument;
  * Get a (non RDF) document from the LBDserver by providing its URL. Authenticate with a token.
  * @param {string} url The URL of the requested resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Buffer}
+ * @returns {Promise<Buffer>}
  */
 function getDocument(url, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -502,7 +502,7 @@ exports.getDocument = getDocument;
  * Get the metadata of a document resource on the lbdserver. The url of the document should be provided; either with .meta or without (if without; the ".meta" suffix is automatically added).
  * @param {string} url The URL of the requested resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 function getDocumentMetadata(url, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -547,7 +547,7 @@ exports.getDocumentMetadata = getDocumentMetadata;
  * Erase a document (and its corresponding metadata graph) from existence.
  * @param {string} url The URL of the resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 function deleteDocument(url, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -587,7 +587,7 @@ exports.deleteDocument = deleteDocument;
  * @param {string|Blob} [props.acl] An optional parameter to indicate the ACL graph for the resource. Can be a string pointing at the URL of an already existing ACL graph or a new ACL graph, uploaded via a HTMLInputElement.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 function uploadGraph(props, project, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -638,7 +638,7 @@ exports.uploadGraph = uploadGraph;
  * Get a graph by its URL. You can also request metadata graphs explicitly in with this function. However, you may also use the function "getGraphMetadata" for this purpose.
  * @param {string} url The URL of the requested resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Graph}
+ * @returns {Promise<Graph>}
  */
 function getGraph(url, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -678,28 +678,40 @@ function getGraph(url, token) {
  * Get the metadata graph of a given graph. You may either provide the ".meta" suffix or skip it.
  * @param {string} url The URL of the resource corresponding with the metadata graph or the URL of the metadata graph itself.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 function getGraphMetadata(url, token) {
     return __awaiter(this, void 0, void 0, function () {
-        var data, error_16;
+        var response, config, error_16;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 2, , 3]);
+                    _a.trys.push([0, 5, , 6]);
                     if (!url.endsWith(".meta")) {
                         url = url.concat('.meta');
                     }
                     url = modifyUrl(url);
-                    return [4 /*yield*/, getGraph(url, token)];
+                    response = void 0;
+                    if (!token) return [3 /*break*/, 2];
+                    config = {
+                        headers: {
+                            Authorization: "Bearer " + token
+                        }
+                    };
+                    return [4 /*yield*/, axios_1["default"].get(url, config)];
                 case 1:
-                    data = _a.sent();
-                    return [2 /*return*/, data];
-                case 2:
+                    response = _a.sent();
+                    return [3 /*break*/, 4];
+                case 2: return [4 /*yield*/, axios_1["default"].get(url)];
+                case 3:
+                    response = _a.sent();
+                    _a.label = 4;
+                case 4: return [2 /*return*/, response.data];
+                case 5:
                     error_16 = _a.sent();
                     error_16.message = "Error finding metdata graph; " + error_16.message;
                     throw error_16;
-                case 3: return [2 /*return*/];
+                case 6: return [2 /*return*/];
             }
         });
     });
@@ -709,7 +721,7 @@ exports.getGraphMetadata = getGraphMetadata;
  * Erase a project graph and its corresponding metadata graph from existence.
  * @param {string} url The URL of the resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 function deleteGraph(url, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -738,7 +750,7 @@ exports.deleteGraph = deleteGraph;
  * @param {string} project The URL or the ID of the project.
  * @param {string} query A SPARQL select query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {QueryResults}
+ * @returns {Promise<QueryResults>}
  */
 function queryProjectSelect(project, query, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -784,7 +796,7 @@ exports.queryProjectSelect = queryProjectSelect;
  * @param {string} query A SPARQL select query.
  * @param {string[]} graphs An array of the graphs that are to be included in the query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {QueryResults}
+ * @returns {Promise<QueryResults>}
  */
 function queryMultiple(project, query, graphs, token) {
     return __awaiter(this, void 0, void 0, function () {
@@ -922,7 +934,7 @@ function updateProject(project, query, token) {
  * @param {string} url The url of the graph to be updated.
  * @param {string} query A SPARQL INSERT/DELETE query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 function updateGraph(url, query, token) {
     return __awaiter(this, void 0, void 0, function () {

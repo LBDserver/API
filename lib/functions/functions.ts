@@ -507,8 +507,19 @@ async function getGraphMetadata(url: string, token?: string): Promise<PROJECT.IR
       url = url.concat('.meta')
     }
     url = modifyUrl(url)
-    const data: PROJECT.IReturnMetadata = await getGraph(url, token)
-    return data
+    let response: AXIOS.AxiosResponse
+    if (token) {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      response = await axios.get(url, config)
+    } else {
+      response = await axios.get(url)
+    }
+    return response.data
   } catch (error) {
     error.message = `Error finding metdata graph; ${error.message}`
     throw error

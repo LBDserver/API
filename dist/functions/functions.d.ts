@@ -33,7 +33,7 @@ declare function login(email: string, password: string): Promise<USER.IReturnUse
 /**
  * Log out on the LBDserver (backend defined in process.env.REACT_APP_BACKEND)
  * @param {string} token The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 declare function logout(token: string): Promise<void>;
 /**
@@ -59,13 +59,13 @@ declare function logout(token: string): Promise<void>;
  */
 /**
  * Get all the documents accessible to unauthenticated users (public projects) on the local LBDserver (backend defined in process.env.REACT_APP_BACKEND)
- * @returns {Project[]}
+ * @returns {Promise<Project[]>}
  */
 declare function getOpenProjects(): Promise<PROJECT.IReturnProject[]>;
 /**
  * Get all the projects associated with the currently authenticated user.
  * @param {string} token The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Project[]}
+ * @returns {Promise<Project[]>}
  */
 declare function getUserProjects(token: string): Promise<PROJECT.IReturnProject[]>;
 /**
@@ -75,28 +75,28 @@ declare function getUserProjects(token: string): Promise<PROJECT.IReturnProject[
  * @param {string} project.description A small description of the project. It will be registered in the project metadata graph as rdfs:comment.
  * @param {boolean} project.open Whether the project should be visible for the broader public or only for the creator. This is registered within the default ACL file (which can be changed afterwards as well).
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Project}
+ * @returns {Promise<Project>}
  */
 declare function createProject(project: PROJECT.ICreateProject, token?: string): Promise<PROJECT.IReturnProject>;
 /**
  * Get a project by its URL or ID. If an ID is given, the URL is reconstructed via the backend URL defined in process.env.REACT_APP_BACKEND.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. Optional.
- * @returns {Project}
+ * @returns {Promise<Project>}
  */
 declare function getOneProject(project: string, token?: string): Promise<PROJECT.IReturnProject>;
 /**
  * Delete a project by ID or URL. If an ID is provided; the URL is reconstructed based on the backend URL defined in process.env.REACT_APP_BACKEND.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 declare function deleteProject(project: string, token?: string): Promise<void>;
 /**
  * Delete a resource and its metadata graph.
  * @param {string} url The url of the resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 declare function deleteResource(url: string, token?: string): Promise<void>;
 interface IUploadResource {
@@ -114,28 +114,28 @@ interface IUploadResource {
  * @param {string|Blob} [props.acl] An optional parameter to indicate the ACL graph for the resource. Can be a string pointing at the URL of an already existing ACL graph or a new ACL graph, uploaded via a HTMLInputElement.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 declare function uploadDocument(props: IUploadResource, project: string, token?: string): Promise<PROJECT.IReturnMetadata>;
 /**
  * Get a (non RDF) document from the LBDserver by providing its URL. Authenticate with a token.
  * @param {string} url The URL of the requested resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Buffer}
+ * @returns {Promise<Buffer>}
  */
 declare function getDocument(url: string, token?: string): Promise<Buffer>;
 /**
  * Get the metadata of a document resource on the lbdserver. The url of the document should be provided; either with .meta or without (if without; the ".meta" suffix is automatically added).
  * @param {string} url The URL of the requested resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 declare function getDocumentMetadata(url: string, token?: string): Promise<PROJECT.IReturnMetadata>;
 /**
  * Erase a document (and its corresponding metadata graph) from existence.
  * @param {string} url The URL of the resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 declare function deleteDocument(url: string, token?: string): Promise<void>;
 /**
@@ -153,21 +153,21 @@ declare function deleteDocument(url: string, token?: string): Promise<void>;
  * @param {string|Blob} [props.acl] An optional parameter to indicate the ACL graph for the resource. Can be a string pointing at the URL of an already existing ACL graph or a new ACL graph, uploaded via a HTMLInputElement.
  * @param {string} project The URL or the ID of the project.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 declare function uploadGraph(props: IUploadResource, project: string, token?: string): Promise<PROJECT.IReturnMetadata>;
 /**
  * Get the metadata graph of a given graph. You may either provide the ".meta" suffix or skip it.
  * @param {string} url The URL of the resource corresponding with the metadata graph or the URL of the metadata graph itself.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Metadata}
+ * @returns {Promise<Metadata>}
  */
 declare function getGraphMetadata(url: string, token?: string): Promise<PROJECT.IReturnMetadata>;
 /**
  * Erase a project graph and its corresponding metadata graph from existence.
  * @param {string} url The URL of the resource.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 declare function deleteGraph(url: string, token?: string): Promise<void>;
 /**
@@ -175,7 +175,7 @@ declare function deleteGraph(url: string, token?: string): Promise<void>;
  * @param {string} project The URL or the ID of the project.
  * @param {string} query A SPARQL select query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {QueryResults}
+ * @returns {Promise<QueryResults>}
  */
 declare function queryProjectSelect(project: string, query: string, token?: string): Promise<PROJECT.IQueryResults>;
 /**
@@ -184,7 +184,7 @@ declare function queryProjectSelect(project: string, query: string, token?: stri
  * @param {string} query A SPARQL select query.
  * @param {string[]} graphs An array of the graphs that are to be included in the query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {QueryResults}
+ * @returns {Promise<QueryResults>}
  */
 declare function queryMultiple(project: string, query: string, graphs: string[], token?: string): Promise<PROJECT.IQueryResults>;
 /**
@@ -200,7 +200,7 @@ declare function queryGraphSelect(url: string, query: string, token?: string): P
  * @param {string} url The url of the graph to be updated.
  * @param {string} query A SPARQL INSERT/DELETE query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {void}
+ * @returns {Promise<void>}
  */
 declare function updateGraph(url: string, query: string, token?: string): Promise<void>;
 export { getOpenProjects, logout, register, login, getUserProjects, createProject, uploadDocument, uploadGraph, getDocument, getOneProject, getDocumentMetadata, deleteProject, deleteDocument, getGraphMetadata, deleteResource, deleteGraph, queryProjectSelect, queryGraphSelect, updateGraph, queryMultiple };

@@ -32,8 +32,10 @@ interface IReturnMetadata {
     uri: string;
     metadata: string;
 }
-interface IReturnGraph extends IReturnMetadata {
+interface IReturnGraph {
+    uri: string;
     data?: IResourceObject;
     results?: IQueryResults;
+    metadata?: string;
 }
 export { ICreateProject, IReturnProject, IReturnMetadata, IReturnGraph, IQueryResults };

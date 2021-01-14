@@ -41,9 +41,11 @@ interface IReturnMetadata {
     metadata: string,
 }
 
-interface IReturnGraph extends IReturnMetadata {
-    data?: IResourceObject,
-    results?: IQueryResults
+interface IReturnGraph {
+    uri: string;
+    data?: IResourceObject;
+    results?: IQueryResults;
+    metadata?: string;
 }
 
 export {
