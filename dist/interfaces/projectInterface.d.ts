@@ -1,5 +1,4 @@
 /// <reference types="node" />
-import * as express from 'express';
 interface ICreateProject {
     title: string;
     description: string;
@@ -30,9 +29,6 @@ interface IQueryResults {
 interface IResourceObject {
     [x: string]: string;
 }
-interface IUploadResourceRequest extends express.Request {
-    resource?: Buffer;
-}
 interface IReturnMetadata {
     uri: string;
     metadata?: string;
@@ -43,4 +39,4 @@ interface IReturnGraph extends IReturnMetadata {
     data?: Buffer | string;
     results?: IQueryResults;
 }
-export { ICreateProject, IReturnProject, IUploadResourceRequest, IReturnMetadata, IReturnGraph, IQueryResults };
+export { ICreateProject, IReturnProject, IReturnMetadata, IReturnGraph, IQueryResults };
