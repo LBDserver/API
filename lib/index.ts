@@ -8,7 +8,6 @@ import {
 import {
     ICreateProject,
     IReturnProject ,
-    IUploadResourceRequest,
     IReturnMetadata,
     IReturnGraph,
     IQueryResults
@@ -40,7 +39,6 @@ import {
 export {
     ICreateProject,
     IReturnProject,
-    IUploadResourceRequest,
     IReturnMetadata,
     IReturnGraph,
     IQueryResults,

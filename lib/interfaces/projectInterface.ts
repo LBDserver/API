@@ -37,10 +37,6 @@ interface IResourceObject {
     [x: string]: string
 }
 
-interface IUploadResourceRequest extends express.Request {
-    resource?: Buffer
-}
-
 interface IReturnMetadata {
     uri: string,
     metadata?: string,
@@ -56,7 +52,6 @@ interface IReturnGraph extends IReturnMetadata {
 export {
     ICreateProject,
     IReturnProject ,
-    IUploadResourceRequest,
     IReturnMetadata,
     IReturnGraph,
     IQueryResults
