@@ -6,7 +6,7 @@ import { translate, toSparql } from 'sparqlalgebrajs'
 
 /**
  * 
- * @typedef {Object} User
+ * @class {Object} User
  * @property {string} username
  * @property {string} email
  * @property {string[]} projects
@@ -15,7 +15,7 @@ import { translate, toSparql } from 'sparqlalgebrajs'
 
 /**
  * 
- * @typedef {Object} returnUser
+ * @class {Object} returnUser
  * @property {User} user
  * @property {string} token
  */
@@ -661,10 +661,6 @@ async function updateGraph(url: string, query: string, token?: string): Promise<
 }
 
 ///////////////// HELPER FUNCTIONS ///////////////
-/**
- * Makes sure an url is present. If an url is already given to the function, the base of the url gets modified (for localhost usage). If not, the project url is reconstructed using the backend url (provided in the process.env.REACT_APP_BACKEND) and the project id.
- * @param {string} id The project ID or original URL
- */
 function modifyProjectUrl(id: string): string {
   let url: string
   try {
@@ -675,10 +671,6 @@ function modifyProjectUrl(id: string): string {
   return url
 }
 
-/**
- * Modifies the url to the backend, if the backend is running locally. Therefore, the process.env.REACT_APP_BACKEND should be defined.
- * @param url 
- */
 function modifyUrl(url: string) {
   try {
     const fullUrl = new URL(url)
