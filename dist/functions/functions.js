@@ -41,7 +41,7 @@ var axios_1 = require("axios");
 var sparqlalgebrajs_1 = require("sparqlalgebrajs");
 /**
  *
- * @class {Object} User
+ * @typedef {Object} User
  * @property {string} username
  * @property {string} email
  * @property {string[]} projects
@@ -49,7 +49,7 @@ var sparqlalgebrajs_1 = require("sparqlalgebrajs");
  */
 /**
  *
- * @class {Object} returnUser
+ * @typedef {Object} returnUser
  * @property {User} user
  * @property {string} token
  */

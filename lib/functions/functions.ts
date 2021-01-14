@@ -6,7 +6,7 @@ import { translate, toSparql } from 'sparqlalgebrajs'
 
 /**
  * 
- * @class {Object} User
+ * @typedef {Object} User
  * @property {string} username
  * @property {string} email
  * @property {string[]} projects
@@ -15,7 +15,7 @@ import { translate, toSparql } from 'sparqlalgebrajs'
 
 /**
  * 
- * @class {Object} returnUser
+ * @typedef {Object} returnUser
  * @property {User} user
  * @property {string} token
  */

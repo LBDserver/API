@@ -3,7 +3,7 @@ import * as USER from "../interfaces/userInterface";
 import * as PROJECT from '../interfaces/projectInterface';
 /**
  *
- * @class {Object} User
+ * @typedef {Object} User
  * @property {string} username
  * @property {string} email
  * @property {string[]} projects
@@ -11,7 +11,7 @@ import * as PROJECT from '../interfaces/projectInterface';
  */
 /**
  *
- * @class {Object} returnUser
+ * @typedef {Object} returnUser
  * @property {User} user
  * @property {string} token
  */
