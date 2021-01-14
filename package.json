@@ -1,7 +1,7 @@
 {
-  "name": "lbdapi",
-  "version": "1.0.0",
-  "description": "Api documentation for the LBDserver back- and frontend",
+  "name": "lbd-server",
+  "version": "0.1.0",
+  "description": "API documentation to communicate with the LBDserver backend.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

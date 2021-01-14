@@ -199,7 +199,7 @@ function getUserProjects(token) {
 exports.getUserProjects = getUserProjects;
 /**
  * Create a new project on the local LBDserver
- * @param {Object} project The project object.
+ * @param {Object.<string, any>} project The project object.
  * @param {string} project.title The title "name" of the project. It will be registered in the project metadata graph of the project as rdfs:label.
  * @param {string} project.description A small description of the project. It will be registered in the project metadata graph as rdfs:comment.
  * @param {boolean} project.open Whether the project should be visible for the broader public or only for the creator. This is registered within the default ACL file (which can be changed afterwards as well).
@@ -358,7 +358,7 @@ function deleteResource(url, token) {
 exports.deleteResource = deleteResource;
 /**
  * Upload a document to a defined project. Props include a "label", a "description" and a "resource", with the "resource" referring to the actual file to be uploaded. The "label" and "description" are used in the automatically created metadata file, which is equal to {fileurl}.meta.
- * @param {Object} props The properties of the object to be uploaded.
+ * @param {Object.<string, any>} props The properties of the object to be uploaded.
  * @param {string} props.label A label for the resource. It will be registered in the metadata graph of the resource as rdfs:label.
  * @param {string} props.description A description for the resource. It will be registered in the metadata graph of the resource as rdfs:comment.
  * @param {Blob} props.file The file originating from a HTMLInputElement upload. Only one file at a time.
@@ -522,7 +522,7 @@ exports.deleteDocument = deleteDocument;
 ////////////// GRAPH FUNCTIONS ///////////////
 /**
  * Upload an RDF graph to a defined project. Props include a "label", a "description" and a "resource", with the "resource" referring to the actual RDF graph to be uploaded. In the case no resource is passed, an empty graph gets created, using the label and description in the metadata, which is equal to {graphurl}.meta. A custom ACL graph or reference may be provided.
- * @param {Object} props The properties of the object to be uploaded.
+ * @param {Object.<string, any>} props The properties of the object to be uploaded.
  * @param {string} props.label A label for the resource. It will be registered in the metadata graph of the resource as rdfs:label.
  * @param {string} props.description A description for the resource. It will be registered in the metadata graph of the resource as rdfs:comment.
  * @param {Blob} props.file The file originating from a HTMLInputElement upload. Only one file at a time.
