@@ -97,7 +97,7 @@ async function logout(token: string): Promise<void> {
 /**
  * @typedef {Object} Metadata
  * @property {string} uri URI of the document
- * @property {Object} metadata The metadata as JSON-LD.
+ * @property {Object} metadata The metadata as JSON-LD. 
  */
 
 //////////////////// PROJECT OBJECTS ////////////////////
@@ -106,10 +106,16 @@ async function logout(token: string): Promise<void> {
  * @property {Object} metadata A JSON-LD object of the project metadata
  * @property {string} id The project id
  * @property {string} [uri] The project uri. Optional (only when creating a project => otherwise it is just the url of the request)
- * @property {resource} graphs An object containing all the graphs in the project. The object key is the graph url, the value is its metadata as JSON-LD. 
- * @property {resource} documents An object containing all the documents in the project. The object key is the document url, the value is its metadata as JSON-LD. 
+ * @property {Resource} graphs An object containing all the graphs in the project. The object key is the graph url, the value is its metadata as JSON-LD. 
+ * @property {Resource} documents An object containing all the documents in the project. The object key is the document url, the value is its metadata as JSON-LD. 
  * @property {QueryResults} [results] the result of an eventual SPARQL SELECT query. Only if a query was sent along.
  */
+
+ /**
+  * @typedef Resource
+  * @property {Object} metadata
+  * @property {string[]} permissions
+  */
 
 /**
  * @typedef {Object} QueryResults
