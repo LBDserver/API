@@ -88,6 +88,8 @@ $ npm install lbd-server
 <dd></dd>
 <dt><a href="#Project">Project</a> : <code>Object</code></dt>
 <dd></dd>
+<dt><a href="#Resource">Resource</a></dt>
+<dd></dd>
 <dt><a href="#QueryResults">QueryResults</a> : <code>Object</code></dt>
 <dd></dd>
 <dt><a href="#Graph">Graph</a> : <code>Object</code></dt>
@@ -405,9 +407,20 @@ Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.
 | metadata | <code>Object</code> | A JSON-LD object of the project metadata |
 | id | <code>string</code> | The project id |
 | [uri] | <code>string</code> | The project uri. Optional (only when creating a project => otherwise it is just the url of the request) |
-| graphs | <code>resource</code> | An object containing all the graphs in the project. The object key is the graph url, the value is its metadata as JSON-LD. |
-| documents | <code>resource</code> | An object containing all the documents in the project. The object key is the document url, the value is its metadata as JSON-LD. |
+| graphs | [<code>Resource</code>](#Resource) | An object containing all the graphs in the project. The object key is the graph url, the value is its metadata as JSON-LD. |
+| documents | [<code>Resource</code>](#Resource) | An object containing all the documents in the project. The object key is the document url, the value is its metadata as JSON-LD. |
 | [results] | [<code>QueryResults</code>](#QueryResults) | the result of an eventual SPARQL SELECT query. Only if a query was sent along. |
+
+<a name="Resource"></a>
+
+## Resource
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| metadata | <code>Object</code> | 
+| permissions | <code>Array.&lt;string&gt;</code> | 
 
 <a name="QueryResults"></a>
 
