@@ -6,10 +6,10 @@ interface ICreateProject {
 interface IReturnProject {
     metadata: string;
     id: string;
-    uri?: string;
+    uri: string;
     graphs: IResourceObject;
     documents: IResourceObject;
-    permissions?: string[];
+    permissions: string[];
     results?: IQueryResults;
 }
 interface IQueryResults {
@@ -31,9 +31,11 @@ interface IResourceObject {
 interface IReturnMetadata {
     uri: string;
     metadata: string;
+    permissions: string[];
 }
 interface IReturnGraph {
     uri: string;
+    permissions?: string[];
     data?: IResourceObject;
     results?: IQueryResults;
     metadata?: string;

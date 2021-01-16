@@ -167,9 +167,14 @@ exports.logout = logout;
  * @property {Object} metadata A JSON-LD object of the project metadata
  * @property {string} id The project id
  * @property {string} [uri] The project uri. Optional (only when creating a project => otherwise it is just the url of the request)
- * @property {resource} graphs An object containing all the graphs in the project. The object key is the graph url, the value is its metadata as JSON-LD.
- * @property {resource} documents An object containing all the documents in the project. The object key is the document url, the value is its metadata as JSON-LD.
+ * @property {Resource} graphs An object containing all the graphs in the project. The object key is the graph url, the value is its metadata as JSON-LD.
+ * @property {Resource} documents An object containing all the documents in the project. The object key is the document url, the value is its metadata as JSON-LD.
  * @property {QueryResults} [results] the result of an eventual SPARQL SELECT query. Only if a query was sent along.
+ */
+/**
+ * @typedef Resource
+ * @property {Object} metadata
+ * @property {string[]} permissions
  */
 /**
  * @typedef {Object} QueryResults
@@ -311,7 +316,6 @@ function getOneProject(project, token) {
                     _a.label = 4;
                 case 4:
                     data = response.data;
-                    console.log('data', data);
                     return [2 /*return*/, data];
                 case 5:
                     error_7 = _a.sent();
@@ -530,9 +534,7 @@ function getDocumentMetadata(url, token) {
                 case 3:
                     response = _a.sent();
                     _a.label = 4;
-                case 4:
-                    console.log('response.data', response.data);
-                    return [2 /*return*/, response.data];
+                case 4: return [2 /*return*/, response.data];
                 case 5:
                     error_12 = _a.sent();
                     error_12.message = "Unable to fetch document metadata; " + error_12.message;
@@ -761,7 +763,6 @@ function queryProjectSelect(project, query, token) {
                     _a.trys.push([0, 5, , 6]);
                     url = modifyProjectUrl(project);
                     url = url + "?query=" + query.toString();
-                    console.log('url', url);
                     response = void 0;
                     if (!token) return [3 /*break*/, 2];
                     config = {
@@ -817,10 +818,8 @@ function queryMultiple(project, query, graphs, token) {
                         named: []
                     };
                     query = sparqlalgebrajs_1.toSparql(newAlgebra);
-                    console.log('query', query);
                     url = modifyProjectUrl(project);
                     url = url + "?query=" + encodeURIComponent(query.toString());
-                    console.log('url', url);
                     response = void 0;
                     if (!token) return [3 /*break*/, 2];
                     config = {
@@ -865,7 +864,6 @@ function queryGraphSelect(url, query, token) {
                     _a.trys.push([0, 5, , 6]);
                     url = modifyUrl(url);
                     url = url + "?query=" + query.toString();
-                    console.log('url', url);
                     response = void 0;
                     if (!token) return [3 /*break*/, 2];
                     config = {
@@ -903,7 +901,6 @@ function updateProject(project, query, token) {
                     _a.trys.push([0, 5, , 6]);
                     url = modifyProjectUrl(project);
                     url = url + "?update=" + encodeURIComponent(query.toString());
-                    console.log(url);
                     response = void 0;
                     if (!token) return [3 /*break*/, 2];
                     config = {
@@ -943,11 +940,9 @@ function updateGraph(url, query, token) {
             switch (_b.label) {
                 case 0:
                     _b.trys.push([0, 2, , 3]);
-                    console.log('url', url);
                     urlProps = new URL(url);
                     project = urlProps.pathname.split("/")[2];
                     algebra = sparqlalgebrajs_1.translate(query, { quads: true });
-                    console.log('algebra', algebra);
                     for (_i = 0, _a = Object.keys(algebra); _i < _a.length; _i++) {
                         key = _a[_i];
                         switch (key) {

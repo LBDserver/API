@@ -1,55 +1,43 @@
 interface ICreateProject {
-    title: string,
-    description: string,
-    open: boolean
+    title: string;
+    description: string;
+    open: boolean;
 }
-
-// change graphs and documents to objects with specific fields (metadata)
-// maybe also permissions field
 interface IReturnProject {
-    metadata: string,
-    id: string,
-    uri?: string,
-    graphs: IResourceObject,
-    documents: IResourceObject,
-    permissions?: string[],
-    results?: IQueryResults,
+    metadata: string;
+    id: string;
+    uri: string;
+    graphs: IResourceObject;
+    documents: IResourceObject;
+    permissions: string[];
+    results?: IQueryResults;
 }
-
 interface IQueryResults {
     head: {
-        vars: string[]
-    },
+        vars: string[];
+    };
     results: {
         bindings: {
             [variable: string]: {
-                type: string,
-                value: string
-            }[]
-        }
-    }
+                type: string;
+                value: string;
+            }[];
+        };
+    };
 }
-
 interface IResourceObject {
-    [x: string]: string
+    [x: string]: string;
 }
-
 interface IReturnMetadata {
-    uri: string,
-    metadata: string,
+    uri: string;
+    metadata: string;
+    permissions: string[]
 }
-
 interface IReturnGraph {
     uri: string;
+    permissions?: string[];
     data?: IResourceObject;
     results?: IQueryResults;
     metadata?: string;
 }
-
-export {
-    ICreateProject,
-    IReturnProject ,
-    IReturnMetadata,
-    IReturnGraph,
-    IQueryResults
-}
+export { ICreateProject, IReturnProject, IReturnMetadata, IReturnGraph, IQueryResults };
