@@ -1,8 +1,13 @@
 interface ICreateProject {
     title: string;
     description: string;
-    open: boolean;
 }
+
+interface ICreateProjectWithMetadata {
+    metadata: IResourceObject
+}
+
+
 interface IReturnProject {
     metadata: string;
     id: string;
@@ -40,4 +45,4 @@ interface IReturnGraph {
     results?: IQueryResults;
     metadata?: string;
 }
-export { ICreateProject, IReturnProject, IReturnMetadata, IReturnGraph, IQueryResults };
+export { ICreateProject, IReturnProject, IReturnMetadata, IReturnGraph, IQueryResults, ICreateProjectWithMetadata };
