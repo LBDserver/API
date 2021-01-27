@@ -10,6 +10,7 @@ const newEngine = require('@comunica/actor-init-sparql').newEngine;
 
 const mime = require('mime-types')
 
+/////////////////////// PROJECT FUNCTIONS ///////////////////////
 
 async function createProject(metadata, stakeholders: Array<IAgent>, session) {
     try {
@@ -18,7 +19,8 @@ async function createProject(metadata, stakeholders: Array<IAgent>, session) {
         // check if a dedicated folder exists for lbd projects (if not: create one)
         let lbdLocation = await getLbdLocation(session)
         if (!lbdLocation) {
-            lbdLocation = await createLbdLocation(session, `${myUrl.origin}/lbd/`)
+            lbdLocation = `${myUrl.origin}/lbd/`
+            await createContainer(lbdLocation, session)
         }
 
         // create project ID
@@ -50,6 +52,8 @@ async function deleteProject(url, session) {
         throw error
     }
 }
+
+/////////////////////// RESOURCE FUNCTIONS //////////////////////
 
 async function uploadResource(url, data, options, session): Promise<void> {
         if (!options.overwrite) {
@@ -117,7 +121,38 @@ async function deleteResource(url, session): Promise<void> {
           
           await fetch(url, requestOptions)
     } catch (error) {
-        error.message = `Could not delete graph ${url} - ${error.message}`
+        error.message = `Could not delete resource ${url} - ${error.message}`
+        throw error
+    }
+}
+
+async function deleteGraph(url, session) {
+    await deleteResource(url, session)
+}
+
+async function deleteDocument(url, session) {
+    await deleteResource(url, session)
+}
+
+async function createContainer(url, session) {
+    try {
+
+        if (!url.endsWith("/")) {
+            throw new Error('Url must end with a "/"')
+        }
+
+        const requestOptions = {
+        method: 'PUT',
+        headers: {
+            "Content-Type": "text/turtle"
+        },
+        redirect: 'follow'
+        };
+
+        const response = await fetch(url, requestOptions)
+        const text = await response.text()
+    } catch (error) {
+        error.message = `Unable to create container - ${error.message}`
         throw error
     }
 }
@@ -171,42 +206,6 @@ async function uploadMetadataGraph(url, data, options, session): Promise<void> {
     }
 }
 
-
-
-async function deleteDocument(url, session) {
-    try {
-        // delete metadata graph
-        // delete document
-    } catch (error) {
-        error.message = `Could not create delete ${url} - ${error.message}`
-        throw error
-    }
-}
-
-async function createContainer(url, session) {
-    try {
-
-        if (!url.endsWith("/")) {
-            throw new Error('Url must end with a "/"')
-        }
-
-        const requestOptions = {
-        method: 'PUT',
-        headers: {
-            "Content-Type": "text/turtle"
-        },
-        redirect: 'follow'
-        };
-
-        const response = await fetch(url, requestOptions)
-        const text = await response.text()
-    } catch (error) {
-        error.message = `Unable to create container - ${error.message}`
-        throw error
-    }
-}
-
-
 // async function deleteContainer(url, session): Promise<void> {
 //     try {
 //         const {containers, resources} = await getContainerContent(url, session)
@@ -238,6 +237,8 @@ async function createContainer(url, session) {
 
 // deleteContainer("http://localhost:3000/lbd/", null)
 
+///////////////////////////// QUERY FUNCTIONS //////////////////////////////
+
 async function query(resources: string[], query: string, session): Promise<Array<Map<string, any>>> {
     try {
         const myEngine = newEngine();
@@ -267,17 +268,6 @@ async function getLbdLocation(session): Promise<string> {
     }
 }
 
-async function createLbdLocation(session, location: string): Promise<string> {
-    try {
-
-
-        return location
-    } catch (error) {
-        error.message = `Could not create LBD location - ${error.message}`
-        throw error
-    }
-}
-
 async function checkExistence(graph): Promise<boolean> {
     try {
         const requestOptions = {
@@ -293,10 +283,6 @@ async function checkExistence(graph): Promise<boolean> {
         error.message = `Could not check existence of graph ${graph} - ${error.message}`
         throw error
     }
-}
-
-async function sendInvite() {
-
 }
 
 // getLbdLocation({webId: "http://jwerbrouck.consolidproject.be/profile/card#me"})
