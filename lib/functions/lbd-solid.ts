@@ -4,13 +4,10 @@ import {URL} from 'url'
 import {validateTTL, hasPermission} from '../helperfunctions'
 import { IAgent } from '../interfaces/consolidInterface'
 import { aclTemplate } from '../templates/aclTemplate'
-import {ActorHttpSolidAuthFetch} from '@comunica/actor-http-solid-auth-fetch'
-import { response } from 'express'
 import {Session} from '@inrupt/solid-client-authn-browser'
+import mime from 'mime-types'
 
 const newEngine = require('@comunica/actor-init-sparql').newEngine;
-
-const mime = require('mime-types')
 
 /////////////////////// USER FUNCTIONS //////////////////////////
 async function login(oidcIssuer: string, redirectUrl: string, session: Session): Promise<Session> {
@@ -116,7 +113,7 @@ async function getOneProject(projectId: string, session: Session): Promise<void>
 }
 
 /////////////////////// RESOURCE FUNCTIONS //////////////////////
-async function uploadResource(url: string, data: string, options, session: Session): Promise<void> {
+async function uploadResource(url: string, data: Buffer | string, options, session: Session): Promise<void> {
         if (!options.overwrite) {
             // check if graph does not exist yet  
             const exists = await checkExistence(url)
@@ -354,5 +351,26 @@ async function checkExistence(graph): Promise<boolean> {
         // var file = Buffer.from(data);
         // uploadDocument("http://localhost:3000/qefmoizqj/zeeiee.jpg", file, null)
 export {
-    uploadDocument
+    login,
+    processSession,
+    logout,
+
+    createProject,
+    deleteProject,
+    getUserProjects,
+    getOneProject,
+
+    uploadResource,
+    uploadGraph,
+    uploadDocument,
+    deleteResource,
+    deleteGraph,
+    deleteDocument,
+
+    createContainer,
+    getContainerContent,
+    uploadMetadataGraph,
+
+    query
 }
+

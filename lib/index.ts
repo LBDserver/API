@@ -1,69 +1,47 @@
 import {
-    IUser,
-    IRegisterRequest,
-    ILoginRequest,
-    IReturnUser
-} from './interfaces/userInterface'
-
-import {
-    ICreateProject,
-    IReturnProject ,
-    IReturnMetadata,
-    IReturnGraph,
-    IQueryResults
-} from './interfaces/projectInterface'
-
-import {
-    getOpenProjects,
-    logout,
-    register,
     login,
-    getUserProjects,
+    processSession,
+    logout,
+
     createProject,
-    uploadDocument,
-    uploadGraph,
-    getDocument,
-    getOneProject,
-    getDocumentMetadata,
     deleteProject,
-    deleteDocument,
-    getGraphMetadata,
+    getUserProjects,
+    getOneProject,
+
+    uploadResource,
+    uploadGraph,
+    uploadDocument,
     deleteResource,
     deleteGraph,
-    queryProjectSelect,
-    queryGraphSelect,
-    updateGraph,
-    queryMultiple
-  } from './functions/functions'
+    deleteDocument,
+
+    createContainer,
+    getContainerContent,
+    uploadMetadataGraph,
+
+    query
+} from './functions/lbd-solid'
 
 export {
-    ICreateProject,
-    IReturnProject,
-    IReturnMetadata,
-    IReturnGraph,
-    IQueryResults,
-    IUser,
-    IRegisterRequest,
-    ILoginRequest,
-    IReturnUser,
-    getOpenProjects,
-    logout,
-    register,
     login,
-    getUserProjects,
+    processSession,
+    logout,
+
     createProject,
-    uploadDocument,
-    uploadGraph,
-    getDocument,
-    getOneProject,
-    getDocumentMetadata,
     deleteProject,
-    deleteDocument,
-    getGraphMetadata,
+    getUserProjects,
+    getOneProject,
+
+    uploadResource,
+    uploadGraph,
+    uploadDocument,
     deleteResource,
     deleteGraph,
-    queryProjectSelect,
-    queryGraphSelect,
-    updateGraph,
-    queryMultiple
+    deleteDocument,
+
+    createContainer,
+    getContainerContent,
+    uploadMetadataGraph,
+
+    query
 }
