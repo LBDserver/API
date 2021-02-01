@@ -343,13 +343,6 @@ async function checkExistence(graph): Promise<boolean> {
     }
 }
 
-// getLbdLocation({webId: "http://jwerbrouck.consolidproject.be/profile/card#me"})
-
-// checkExistence("https://jwerbrouck.inrupt.net/profile/card#me")
-        // var fs = require('fs');
-        // var data = fs.readFileSync('/home/jmauwerb/Pictures/5fav.JPG');
-        // var file = Buffer.from(data);
-        // uploadDocument("http://localhost:3000/qefmoizqj/zeeiee.jpg", file, null)
 export {
     login,
     processSession,
@@ -373,4 +366,3 @@ export {
 
     query
 }
-

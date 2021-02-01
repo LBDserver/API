@@ -1,6 +1,6 @@
 {
     // Change this to match your project
-    "include": ["lib/*.ts", "lib/functions/*.ts", "lib/helperfunctions/*.ts"],
+    "include": ["lib/*.ts", "lib/functions/*.ts", "lib/helperfunctions/*.ts", "lib/interfaces/*.ts", "lib/templates/*.ts"],
   
     "compilerOptions": {
       // Tells TypeScript to read JS files, as

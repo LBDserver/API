@@ -1,4 +1,19 @@
 import {
+    IUser,
+    IRegisterRequest,
+    ILoginRequest,
+    IReturnUser
+} from './interfaces/userInterface'
+
+import {
+    ICreateProject,
+    IReturnProject ,
+    IReturnMetadata,
+    IReturnGraph,
+    IQueryResults
+} from './interfaces/projectInterface'
+
+import {
     login,
     processSession,
     logout,
@@ -20,28 +35,34 @@ import {
     uploadMetadataGraph,
 
     query
-} from './functions/lbd-solid'
+}
+ from './functions/lbd-solid'
 
 export {
+    ICreateProject,
+    IReturnProject,
+    IReturnMetadata,
+    IReturnGraph,
+    IQueryResults,
+    IUser,
+    IRegisterRequest,
+    ILoginRequest,
+    IReturnUser,
     login,
     processSession,
     logout,
-
     createProject,
-    deleteProject,
-    getUserProjects,
-    getOneProject,
-
-    uploadResource,
-    uploadGraph,
     uploadDocument,
+    uploadGraph,
+    getOneProject,
+    deleteProject,
+    deleteDocument,
     deleteResource,
     deleteGraph,
-    deleteDocument,
-
+    uploadResource,
     createContainer,
     getContainerContent,
     uploadMetadataGraph,
-
+    getUserProjects,
     query
 }
