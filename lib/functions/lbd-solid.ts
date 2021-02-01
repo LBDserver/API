@@ -6,15 +6,56 @@ import { IAgent } from '../interfaces/consolidInterface'
 import { aclTemplate } from '../templates/aclTemplate'
 import {ActorHttpSolidAuthFetch} from '@comunica/actor-http-solid-auth-fetch'
 import { response } from 'express'
+import {Session} from '@inrupt/solid-client-authn-browser'
+
 const newEngine = require('@comunica/actor-init-sparql').newEngine;
 
 const mime = require('mime-types')
 
+/////////////////////// USER FUNCTIONS //////////////////////////
+async function login(oidcIssuer: string, redirectUrl: string, session: Session): Promise<Session> {
+    try {
+        await session.login({
+            oidcIssuer,
+            redirectUrl
+        })
+        return session
+    } catch (error) {
+        error.message = `Unable to login - ${error.message}`
+        throw error
+    }
+}
+
+async function processSession(session: Session): Promise<Session> {
+    try {
+        const authCode = new URL(window.location.href).searchParams.get("code");
+        if (authCode) {
+          console.log("Being redirected from the IdP");
+          await session.handleIncomingRedirect(window.location.href)
+        }
+        return session
+    } catch (error) {
+        error.message = `Unable to process session - ${error.message}`
+        throw error
+    }
+}
+
+async function logout(session: Session): Promise<Session> {
+    try {
+        await session.logout()
+        return session
+    } catch (error) {
+        error.message = `Unable to logout - ${error.message}`
+        throw error
+    }
+}
+
+
 /////////////////////// PROJECT FUNCTIONS ///////////////////////
 
-async function createProject(metadata, stakeholders: Array<IAgent>, session) {
+async function createProject(metadata, stakeholders: Array<IAgent>, session: Session): Promise<void> {
     try {
-        const myUrl = new URL(session.webId)
+        const myUrl = new URL(session.info.webId)
 
         // check if a dedicated folder exists for lbd projects (if not: create one)
         let lbdLocation = await getLbdLocation(session)
@@ -22,6 +63,9 @@ async function createProject(metadata, stakeholders: Array<IAgent>, session) {
             lbdLocation = `${myUrl.origin}/lbd/`
             await createContainer(lbdLocation, session)
         }
+
+        // check if metadata is valid TTL
+        await validateTTL(metadata)
 
         // create project ID
         const id = v4()
@@ -44,7 +88,7 @@ async function createProject(metadata, stakeholders: Array<IAgent>, session) {
     }
 }
 
-async function deleteProject(url, session) {
+async function deleteProject(projectId: string,session: Session) {
     try {
 
     } catch (error) {
@@ -53,11 +97,28 @@ async function deleteProject(url, session) {
     }
 }
 
-/////////////////////// RESOURCE FUNCTIONS //////////////////////
+async function getUserProjects(session: Session) {
+    try {
+        return
+    } catch (error) {
+        error.message = `Unable to get user projects - ${error.message}`
+        throw error
+    }
+}
 
-async function uploadResource(url, data, options, session): Promise<void> {
+async function getOneProject(projectId: string, session: Session): Promise<void> {
+    try {
+        
+    } catch (error) {
+        error.message = `Unable to get project with ID ${projectId} - ${error.message}`
+        throw error
+    }
+}
+
+/////////////////////// RESOURCE FUNCTIONS //////////////////////
+async function uploadResource(url: string, data: string, options, session: Session): Promise<void> {
         if (!options.overwrite) {
-            // check if graph does not exist yet
+            // check if graph does not exist yet  
             const exists = await checkExistence(url)
             if (exists) {
                 throw new Error("Resource already exists")
@@ -80,16 +141,16 @@ async function uploadResource(url, data, options, session): Promise<void> {
                 "Content-Type": mimetype
             },
             body: data,
-            redirect: 'follow'
+            redirect: 'follow' as RequestRedirect
         };
 
-        const response = await fetch(url, requestOptions)
+        const response = await session.fetch(url, requestOptions)
         const text = await response.text()
         return
 
 }
 
-async function uploadGraph(url, data, metadata, options, session): Promise<void> {
+async function uploadGraph(url, data, metadata, options, session: Session): Promise<void> {
     try {
         await validateTTL(metadata)
         await uploadResource(url, data, options, session)
@@ -101,7 +162,7 @@ async function uploadGraph(url, data, metadata, options, session): Promise<void>
     }
 }
 
-async function uploadDocument(url, data: Buffer | string, metadata: string, options, session): Promise<void> {
+async function uploadDocument(url, data: Buffer | string, metadata: string, options, session: Session): Promise<void> {
     try {
         await validateTTL(metadata)
         await uploadResource(url, data, options, session)
@@ -112,7 +173,7 @@ async function uploadDocument(url, data: Buffer | string, metadata: string, opti
     }
 }
 
-async function deleteResource(url, session): Promise<void> {
+async function deleteResource(url, session: Session): Promise<void> {
     try {
         var requestOptions = {
             method: 'DELETE',
@@ -126,15 +187,15 @@ async function deleteResource(url, session): Promise<void> {
     }
 }
 
-async function deleteGraph(url, session) {
+async function deleteGraph(url, session: Session) {
     await deleteResource(url, session)
 }
 
-async function deleteDocument(url, session) {
+async function deleteDocument(url, session: Session) {
     await deleteResource(url, session)
 }
 
-async function createContainer(url, session) {
+async function createContainer(url, session: Session) {
     try {
 
         if (!url.endsWith("/")) {
@@ -193,7 +254,7 @@ async function getContainerContent(url, session): Promise<{containers: string[],
     }
 }
 
-async function uploadMetadataGraph(url, data, options, session): Promise<void> {
+async function uploadMetadataGraph(url, data, options, session: Session): Promise<void> {
     try {
         if (!url.endsWith(".meta")) {
             url = url.concat('.meta')
@@ -239,7 +300,7 @@ async function uploadMetadataGraph(url, data, options, session): Promise<void> {
 
 ///////////////////////////// QUERY FUNCTIONS //////////////////////////////
 
-async function query(resources: string[], query: string, session): Promise<Array<Map<string, any>>> {
+async function query(resources: string[], query: string, session: Session): Promise<Array<Map<string, any>>> {
     try {
         const myEngine = newEngine();
         const result = await myEngine.query(query, { sources: resources });
@@ -258,7 +319,7 @@ async function query(resources: string[], query: string, session): Promise<Array
  * @param webId 
  */
 async function getLbdLocation(session): Promise<string> {
-    const url = new URL(session.webId)
+    const url = new URL(session.info.webId)
     let lbdLocation: string = `${url.origin}/lbd/`
     const exists = await checkExistence(lbdLocation)
     if (exists) {
@@ -292,11 +353,6 @@ async function checkExistence(graph): Promise<boolean> {
         // var data = fs.readFileSync('/home/jmauwerb/Pictures/5fav.JPG');
         // var file = Buffer.from(data);
         // uploadDocument("http://localhost:3000/qefmoizqj/zeeiee.jpg", file, null)
-
-
-
-// var fs = require('fs');
-// var data = fs.readFileSync('/home/jmauwerb/Pictures/5fav.JPG');
-// var file = Buffer.from(data);
-
-// uploadDocument("http://localhost:3000/jeroen/file3.json", JSON.stringify({"test": "some tqdfsqdfext"}), "<ex:s> <ex:p> <ex:o>.", {overwrite: true}, null)
+export {
+    uploadDocument
+}
