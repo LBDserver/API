@@ -6,6 +6,13 @@ import { aclTemplate } from '../templates/aclTemplate';
 import mime from 'mime-types';
 const newEngine = require('@comunica/actor-init-sparql').newEngine;
 /////////////////////// USER FUNCTIONS //////////////////////////
+/**
+ * Log in using OIDC and a Solid Session.
+ * @param {string} oidcIssuer URL for the OIDC issuer. E.g. 'https://broker.pod.inrupt.com'.
+ * @param {string} redirectUrl URL for redirect after login via OIDC. E.g. window.location.href. to return to the original page.
+ * @param {Session} session The solid session object. Will be returned, but if successful, the session will be authenticated and linked to the logged in user/webID.
+ * @returns {Promise<Session>} Returns a Solid Session object
+ */
 async function login(oidcIssuer, redirectUrl, session) {
     try {
         await session.login({
@@ -19,6 +26,11 @@ async function login(oidcIssuer, redirectUrl, session) {
         throw error;
     }
 }
+/**
+ * Helper function to process the session after OIDC login. Retrieves the "code" from the current url.
+ * @param {Session} session The Solid Session object.
+ * @returns {Promise<Session>} Returns a Solid Session object
+ */
 async function processSession(session) {
     try {
         const authCode = new URL(window.location.href).searchParams.get("code");
@@ -33,6 +45,11 @@ async function processSession(session) {
         throw error;
     }
 }
+/**
+ * Log out from a Solid Session.
+ * @param {Session} session The Solid Session object.
+ * @returns {Promise<Session>} Returns a Solid Session object
+ */
 async function logout(session) {
     try {
         await session.logout();
@@ -44,6 +61,12 @@ async function logout(session) {
     }
 }
 /////////////////////// PROJECT FUNCTIONS ///////////////////////
+/**
+ *
+ * @param {string} metadata a valid TTL string for the metadata of the project. Should contain default metadata such as rdfs:label, rdfs:comment. NOTE: in later versions, will be checked with SHACL shape
+ * @param {Array<IAgent>} stakeholders Array of stakeholders to be involved in the project, as well as their access rights to the project in general.
+ * @param {Session} session
+ */
 async function createProject(metadata, stakeholders, session) {
     try {
         const myUrl = new URL(session.info.webId);
@@ -64,6 +87,15 @@ async function createProject(metadata, stakeholders, session) {
         await uploadResource(`${lbdLocation}${id}/.acl`, acl, null, session);
         // invite agents and make aware of their role in the project
         // return project
+        const project = {
+            metadata,
+            id,
+            permissions: ["http://www.w3.org/ns/auth/acl#Read", "http://www.w3.org/ns/auth/acl#Write", "http://www.w3.org/ns/auth/acl#Append", "http://www.w3.org/ns/auth/acl#Control"],
+            uri: lbdLocation + id + '/',
+            graphs: {},
+            documents: {},
+        };
+        return project;
     }
     catch (error) {
         error.message = `Could not create project - ${error.message}`;
@@ -307,10 +339,4 @@ async function checkExistence(graph) {
         throw error;
     }
 }
-// getLbdLocation({webId: "http://jwerbrouck.consolidproject.be/profile/card#me"})
-// checkExistence("https://jwerbrouck.inrupt.net/profile/card#me")
-// var fs = require('fs');
-// var data = fs.readFileSync('/home/jmauwerb/Pictures/5fav.JPG');
-// var file = Buffer.from(data);
-// uploadDocument("http://localhost:3000/qefmoizqj/zeeiee.jpg", file, null)
 export { login, processSession, logout, createProject, deleteProject, getUserProjects, getOneProject, uploadResource, uploadGraph, uploadDocument, deleteResource, deleteGraph, deleteDocument, createContainer, getContainerContent, uploadMetadataGraph, query };

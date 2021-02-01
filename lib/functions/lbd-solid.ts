@@ -6,10 +6,20 @@ import { IAgent } from '../interfaces/consolidInterface'
 import { aclTemplate } from '../templates/aclTemplate'
 import {Session} from '@inrupt/solid-client-authn-browser'
 import mime from 'mime-types'
+import { IReturnProject } from '../interfaces/projectInterface'
+import {getSolidDatasetWithAcl} from '@inrupt/solid-client'
 
 const newEngine = require('@comunica/actor-init-sparql').newEngine;
 
 /////////////////////// USER FUNCTIONS //////////////////////////
+
+/**
+ * Log in using OIDC and a Solid Session.
+ * @param {string} oidcIssuer URL for the OIDC issuer. E.g. 'https://broker.pod.inrupt.com'.
+ * @param {string} redirectUrl URL for redirect after login via OIDC. E.g. window.location.href. to return to the original page.
+ * @param {Session} session The solid session object. Will be returned, but if successful, the session will be authenticated and linked to the logged in user/webID.
+ * @returns {Promise<Session>} Returns a Solid Session object
+ */
 async function login(oidcIssuer: string, redirectUrl: string, session: Session): Promise<Session> {
     try {
         await session.login({
@@ -23,6 +33,11 @@ async function login(oidcIssuer: string, redirectUrl: string, session: Session):
     }
 }
 
+/**
+ * Helper function to process the session after OIDC login. Retrieves the "code" from the current url.
+ * @param {Session} session The Solid Session object. 
+ * @returns {Promise<Session>} Returns a Solid Session object
+ */
 async function processSession(session: Session): Promise<Session> {
     try {
         const authCode = new URL(window.location.href).searchParams.get("code");
@@ -37,6 +52,11 @@ async function processSession(session: Session): Promise<Session> {
     }
 }
 
+/**
+ * Log out from a Solid Session.
+ * @param {Session} session The Solid Session object. 
+ * @returns {Promise<Session>} Returns a Solid Session object
+ */
 async function logout(session: Session): Promise<Session> {
     try {
         await session.logout()
@@ -49,8 +69,13 @@ async function logout(session: Session): Promise<Session> {
 
 
 /////////////////////// PROJECT FUNCTIONS ///////////////////////
-
-async function createProject(metadata, stakeholders: Array<IAgent>, session: Session): Promise<void> {
+/**
+ * 
+ * @param {string} metadata a valid TTL string for the metadata of the project. Should contain default metadata such as rdfs:label, rdfs:comment. NOTE: in later versions, will be checked with SHACL shape
+ * @param {Array<IAgent>} stakeholders Array of stakeholders to be involved in the project, as well as their access rights to the project in general.
+ * @param {Session} session 
+ */
+async function createProject(metadata: string, stakeholders: Array<IAgent>, session: Session): Promise<IReturnProject> {
     try {
         const myUrl = new URL(session.info.webId)
 
@@ -78,7 +103,16 @@ async function createProject(metadata, stakeholders: Array<IAgent>, session: Ses
 
 
         // return project
+        const project: IReturnProject = {
+            metadata,
+            id,
+            permissions: ["http://www.w3.org/ns/auth/acl#Read", "http://www.w3.org/ns/auth/acl#Write", "http://www.w3.org/ns/auth/acl#Append", "http://www.w3.org/ns/auth/acl#Control"],
+            uri: lbdLocation + id + '/',
+            graphs: {},
+            documents: {},
+        }
 
+        return project
     } catch (error) {
         error.message = `Could not create project - ${error.message}`
         throw error
