@@ -146,6 +146,15 @@ async function getOneProject(projectId: string, session: Session): Promise<void>
     }
 }
 
+async function getOpenProjects() {
+    try {
+        return []
+    } catch (error) {
+        error.message = `Could not get open projects - ${error.message}`
+        throw error
+    }
+}
+
 /////////////////////// RESOURCE FUNCTIONS //////////////////////
 async function uploadResource(url: string, data: Buffer | string, options, session: Session): Promise<void> {
         if (!options.overwrite) {
@@ -386,6 +395,7 @@ export {
     deleteProject,
     getUserProjects,
     getOneProject,
+    getOpenProjects,
 
     uploadResource,
     uploadGraph,

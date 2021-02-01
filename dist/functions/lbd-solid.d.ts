@@ -32,6 +32,7 @@ declare function createProject(metadata: string, stakeholders: Array<IAgent>, se
 declare function deleteProject(projectId: string, session: Session): Promise<void>;
 declare function getUserProjects(session: Session): Promise<void>;
 declare function getOneProject(projectId: string, session: Session): Promise<void>;
+declare function getOpenProjects(): Promise<any[]>;
 declare function uploadResource(url: string, data: Buffer | string, options: any, session: Session): Promise<void>;
 declare function uploadGraph(url: any, data: any, metadata: any, options: any, session: Session): Promise<void>;
 declare function uploadDocument(url: any, data: Buffer | string, metadata: string, options: any, session: Session): Promise<void>;
@@ -45,4 +46,4 @@ declare function getContainerContent(url: any, session: any): Promise<{
 }>;
 declare function uploadMetadataGraph(url: any, data: any, options: any, session: Session): Promise<void>;
 declare function query(resources: string[], query: string, session: Session): Promise<Array<Map<string, any>>>;
-export { login, processSession, logout, createProject, deleteProject, getUserProjects, getOneProject, uploadResource, uploadGraph, uploadDocument, deleteResource, deleteGraph, deleteDocument, createContainer, getContainerContent, uploadMetadataGraph, query };
+export { login, processSession, logout, createProject, deleteProject, getUserProjects, getOneProject, getOpenProjects, uploadResource, uploadGraph, uploadDocument, deleteResource, deleteGraph, deleteDocument, createContainer, getContainerContent, uploadMetadataGraph, query };

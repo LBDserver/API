@@ -127,6 +127,15 @@ async function getOneProject(projectId, session) {
         throw error;
     }
 }
+async function getOpenProjects() {
+    try {
+        return [];
+    }
+    catch (error) {
+        error.message = `Could not get open projects - ${error.message}`;
+        throw error;
+    }
+}
 /////////////////////// RESOURCE FUNCTIONS //////////////////////
 async function uploadResource(url, data, options, session) {
     if (!options.overwrite) {
@@ -339,4 +348,4 @@ async function checkExistence(graph) {
         throw error;
     }
 }
-export { login, processSession, logout, createProject, deleteProject, getUserProjects, getOneProject, uploadResource, uploadGraph, uploadDocument, deleteResource, deleteGraph, deleteDocument, createContainer, getContainerContent, uploadMetadataGraph, query };
+export { login, processSession, logout, createProject, deleteProject, getUserProjects, getOneProject, getOpenProjects, uploadResource, uploadGraph, uploadDocument, deleteResource, deleteGraph, deleteDocument, createContainer, getContainerContent, uploadMetadataGraph, query };
