@@ -22,6 +22,7 @@ import {
     deleteProject,
     getUserProjects,
     getOneProject,
+    getOpenProjects,
 
     uploadResource,
     uploadGraph,
@@ -64,5 +65,6 @@ export {
     getContainerContent,
     uploadMetadataGraph,
     getUserProjects,
-    query
+    query,
+    getOpenProjects
 }
