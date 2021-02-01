@@ -4,8 +4,6 @@ import {URL} from 'url'
 import {validateTTL, hasPermission} from '../helperfunctions'
 import { IAgent } from '../interfaces/consolidInterface'
 import { aclTemplate } from '../templates/aclTemplate'
-import {ActorHttpSolidAuthFetch} from '@comunica/actor-http-solid-auth-fetch'
-import { response } from 'express'
 import {Session} from '@inrupt/solid-client-authn-browser'
 
 const newEngine = require('@comunica/actor-init-sparql').newEngine;
@@ -346,13 +344,26 @@ async function checkExistence(graph): Promise<boolean> {
     }
 }
 
-// getLbdLocation({webId: "http://jwerbrouck.consolidproject.be/profile/card#me"})
-
-// checkExistence("https://jwerbrouck.inrupt.net/profile/card#me")
-        // var fs = require('fs');
-        // var data = fs.readFileSync('/home/jmauwerb/Pictures/5fav.JPG');
-        // var file = Buffer.from(data);
-        // uploadDocument("http://localhost:3000/qefmoizqj/zeeiee.jpg", file, null)
 export {
-    uploadDocument
+    login,
+    processSession,
+    logout,
+
+    createProject,
+    deleteProject,
+    getUserProjects,
+    getOneProject,
+
+    uploadResource,
+    uploadGraph,
+    uploadDocument,
+    deleteResource,
+    deleteGraph,
+    deleteDocument,
+
+    createContainer,
+    getContainerContent,
+    uploadMetadataGraph,
+
+    query
 }

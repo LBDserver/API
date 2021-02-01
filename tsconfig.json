@@ -1,6 +1,6 @@
 {
     // Change this to match your project
-    "include": ["lib/*.ts", "lib/interfaces/userInterface.ts", "lib/interfaces/projectInterface.ts", "lib/functions/functions.ts"],
+    "include": ["lib/*.ts", "lib/functions/*.ts", "lib/helperfunctions/*.ts", "lib/interfaces/*.ts", "lib/templates/*.ts"],
   
     "compilerOptions": {
       // Tells TypeScript to read JS files, as
@@ -13,7 +13,8 @@
       // next to the .js files
       "outDir": "./dist",
       "target": "es2019",
-      "lib": ["ES2019"]
+      "lib": ["ES2019"],
+      "moduleResolution": "node"
     },
 
   }
