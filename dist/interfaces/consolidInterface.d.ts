@@ -1,6 +1,7 @@
 interface IAgent {
     uri: string;
     type: AgentType;
+    roles: string[];
     permissions: Array<PermissionType>;
 }
 declare type PermissionType = "http://www.w3.org/ns/auth/acl#Read" | "http://www.w3.org/ns/auth/acl#Write" | "http://www.w3.org/ns/auth/acl#Append" | "http://www.w3.org/ns/auth/acl#Control";

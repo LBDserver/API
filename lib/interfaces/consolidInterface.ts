@@ -1,6 +1,7 @@
 interface IAgent {
     uri: string,
     type: AgentType,
+    roles: string[],
     permissions: Array<PermissionType>
 }
 

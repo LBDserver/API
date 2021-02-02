@@ -28,4 +28,25 @@ async function aclTemplate(stakeholders) {
         throw error;
     }
 }
-export { aclTemplate };
+async function stakeholderTemplate(stakeholders) {
+    try {
+        let graph = `@prefix  lbd:  <http://lbdserver.org/vocabulary/> .`;
+        stakeholders.forEach(st => {
+            if (st.roles) {
+                let roles = 'lbd:Stakeholder, ';
+                st.roles.forEach(role => {
+                    roles += `<${role}>, `;
+                });
+                roles = roles.substring(0, roles.length - 2) + '.';
+                graph += `<${st.uri}> a ${roles}`;
+            }
+        });
+        await validateTTL(graph);
+        return graph;
+    }
+    catch (error) {
+        error.message = `Could not create ACL graph - ${error.message}`;
+        throw error;
+    }
+}
+export { aclTemplate, stakeholderTemplate };

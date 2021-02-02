@@ -17,6 +17,7 @@ import {
     login,
     processSession,
     logout,
+    register,
 
     createProject,
     deleteProject,
@@ -35,7 +36,8 @@ import {
     getContainerContent,
     uploadMetadataGraph,
 
-    query
+    query,
+    getLbdLocation
 }
  from './functions/lbd-solid'
 
@@ -66,5 +68,7 @@ export {
     uploadMetadataGraph,
     getUserProjects,
     query,
-    getOpenProjects
+    getOpenProjects,
+    register,
+    getLbdLocation
 }
