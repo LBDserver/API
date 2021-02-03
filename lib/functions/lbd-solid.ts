@@ -368,11 +368,6 @@ async function uploadResource(url: string, data: Buffer | string, options: {over
             mimeType = options.mimeType
         }
 
-        // if (mimeType === "text/turtle") {
-        //     // check if data is valid turtle
-        //     await validateTTL(data)
-        // }
-
         var requestOptions = {
             method: 'PUT',
             headers: {
