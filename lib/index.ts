@@ -10,7 +10,7 @@ import {
     IReturnProject ,
     IReturnMetadata,
     IReturnGraph,
-    IQueryResults
+    IQueryResult
 } from './interfaces/projectInterface'
 
 import {
@@ -46,7 +46,7 @@ export {
     IReturnProject,
     IReturnMetadata,
     IReturnGraph,
-    IQueryResults,
+    IQueryResult,
     IUser,
     IRegisterRequest,
     ILoginRequest,

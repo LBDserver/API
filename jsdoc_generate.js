@@ -17,7 +17,7 @@ $ npm install lbd-server
 try {
     fs.unlinkSync("./README.md")
     fs.writeFileSync("./README.md", readmeText)
-    jsdoc2md.render({ files: 'dist/functions/functions.js' })
+    jsdoc2md.render({ files: 'dist/functions/lbd-solid.js' })
     .then(output => fs.appendFile('README.md', output, function (err) {
         if (err) throw err;
         console.log('Saved!');

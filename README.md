@@ -12,438 +12,416 @@ $ npm install lbd-server
 ## Functions
 
 <dl>
-<dt><a href="#register">register(username, email, password)</a> ⇒ <code><a href="#returnUser">Promise.&lt;returnUser&gt;</a></code></dt>
-<dd><p>Register as a user to the local LBDserver (backend defined in process.env.REACT_APP_BACKEND).</p>
+<dt><a href="#login">login(oidcIssuer, redirectUrl, session)</a> ⇒ <code>Promise.&lt;Session&gt;</code></dt>
+<dd><p>Log in using OIDC and a Solid Session.</p>
 </dd>
-<dt><a href="#login">login(email, password)</a> ⇒ <code><a href="#returnUser">Promise.&lt;returnUser&gt;</a></code></dt>
-<dd><p>Login as an existing user to the LBDserver (backend defined in process.env.REACT_APP_BACKEND)</p>
+<dt><a href="#register">register(oidcIssuer, redirecturi, session)</a> ⇒ <code>Promise.&lt;Session&gt;</code></dt>
+<dd><p>Log in using OIDC and a Solid Session.</p>
 </dd>
-<dt><a href="#logout">logout(token)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
-<dd><p>Log out on the LBDserver (backend defined in process.env.REACT_APP_BACKEND)</p>
+<dt><a href="#processSession">processSession(session)</a> ⇒ <code>Promise.&lt;Session&gt;</code></dt>
+<dd><p>Helper function to process the session after OIDC login. Retrieves the &quot;code&quot; from the current uri.</p>
 </dd>
-<dt><a href="#getOpenProjects">getOpenProjects()</a> ⇒ <code>Promise.&lt;Array.&lt;Project&gt;&gt;</code></dt>
-<dd><p>Get all the documents accessible to unauthenticated users (public projects) on the local LBDserver (backend defined in process.env.REACT_APP_BACKEND)</p>
+<dt><a href="#logout">logout(session)</a> ⇒ <code>Promise.&lt;Session&gt;</code></dt>
+<dd><p>Log out from a Solid Session.</p>
 </dd>
-<dt><a href="#getUserProjects">getUserProjects(token)</a> ⇒ <code>Promise.&lt;Array.&lt;Project&gt;&gt;</code></dt>
-<dd><p>Get all the projects associated with the currently authenticated user.</p>
+<dt><a href="#createProject">createProject(stakeholders, session)</a> ⇒ <code>Promise.&lt;ICreateProject&gt;</code></dt>
+<dd><p>Create a new project environment. As the project ID is created here, the project metadata graph (.props) should be created afterwards (createGraph)</p>
 </dd>
-<dt><a href="#createProject">createProject(project, [token])</a> ⇒ <code><a href="#Project">Promise.&lt;Project&gt;</a></code></dt>
-<dd><p>Create a new project on the local LBDserver</p>
+<dt><a href="#deleteProject">deleteProject(uri, session)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
+<dd><p>Delete an LBD project. The project will only be deleted in your own POD, of course.</p>
 </dd>
-<dt><a href="#getOneProject">getOneProject(project, [token])</a> ⇒ <code><a href="#Project">Promise.&lt;Project&gt;</a></code></dt>
-<dd><p>Get a project by its URL or ID. If an ID is given, the URL is reconstructed via the backend URL defined in process.env.REACT_APP_BACKEND.</p>
+<dt><a href="#getUserProjects">getUserProjects(session)</a> ⇒ <code>Promise.&lt;Array.&lt;IReturnProject&gt;&gt;</code></dt>
+<dd><p>Get all the LBD projects in the POD of the authenticated user.</p>
 </dd>
-<dt><a href="#deleteProject">deleteProject(project, [token])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
-<dd><p>Delete a project by ID or URL. If an ID is provided; the URL is reconstructed based on the backend URL defined in process.env.REACT_APP_BACKEND.</p>
+<dt><a href="#getOneProject">getOneProject(uri, session)</a> ⇒ <code>Promise.&lt;IReturnProject&gt;</code></dt>
+<dd><p>Get a single project by its uri. From your local project, other stakeholders are determined and the federated project data you have access to is fetched.</p>
 </dd>
-<dt><a href="#deleteResource">deleteResource(url, [token])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
-<dd><p>Delete a resource and its metadata graph.</p>
+<dt><a href="#getLocalProject">getLocalProject(uri, session)</a> ⇒ <code>Promise.&lt;IReturnProject&gt;</code></dt>
+<dd><p>Get only the project data residing in your POD.</p>
 </dd>
-<dt><a href="#uploadDocument">uploadDocument(props, project, [token])</a> ⇒ <code><a href="#Metadata">Promise.&lt;Metadata&gt;</a></code></dt>
-<dd><p>Upload a document to a defined project. Props include a &quot;label&quot;, a &quot;description&quot; and a &quot;resource&quot;, with the &quot;resource&quot; referring to the actual file to be uploaded. The &quot;label&quot; and &quot;description&quot; are used in the automatically created metadata file, which is equal to {fileurl}.meta.</p>
+<dt><a href="#getProjectResources">getProjectResources(uri, session)</a> ⇒ <code>Promise.&lt;IReturnResources&gt;</code></dt>
+<dd><p>Gets only the graphs and documents, without other project info (i.e. their metadata &amp; permissions)</p>
 </dd>
-<dt><a href="#getDocument">getDocument(url, [token])</a> ⇒ <code>Promise.&lt;Buffer&gt;</code></dt>
-<dd><p>Get a (non RDF) document from the LBDserver by providing its URL. Authenticate with a token.</p>
+<dt><a href="#getOpenProjects">getOpenProjects(lbdLocation)</a> ⇒ <code>Promise.&lt;Array.&lt;IReturnProject&gt;&gt;</code></dt>
+<dd><p>Get the open projects on a specific LBDlocation.</p>
 </dd>
-<dt><a href="#getDocumentMetadata">getDocumentMetadata(url, [token])</a> ⇒ <code><a href="#Metadata">Promise.&lt;Metadata&gt;</a></code></dt>
-<dd><p>Get the metadata of a document resource on the lbdserver. The url of the document should be provided; either with .meta or without (if without; the &quot;.meta&quot; suffix is automatically added).</p>
+<dt><a href="#uploadResource">uploadResource(url, data, options, session)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
+<dd><p>Upload a resource to your POD. You may also use uploadGraph and uploadDocument.</p>
 </dd>
-<dt><a href="#deleteDocument">deleteDocument(url, [token])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
-<dd><p>Erase a document (and its corresponding metadata graph) from existence.</p>
+<dt><a href="#getResource">getResource(uri, session)</a> ⇒ <code>Promise.&lt;any&gt;</code></dt>
+<dd><p>Get a resource actual data.</p>
 </dd>
-<dt><a href="#uploadGraph">uploadGraph(props, project, [token])</a> ⇒ <code><a href="#Metadata">Promise.&lt;Metadata&gt;</a></code></dt>
-<dd><p>Upload an RDF graph to a defined project. Props include a &quot;label&quot;, a &quot;description&quot; and a &quot;resource&quot;, with the &quot;resource&quot; referring to the actual RDF graph to be uploaded. In the case no resource is passed, an empty graph gets created, using the label and description in the metadata, which is equal to {graphurl}.meta. A custom ACL graph or reference may be provided.</p>
+<dt><a href="#getResourceMetadata">getResourceMetadata(uri, session)</a> ⇒ <code>Promise.&lt;IReturnMetadata&gt;</code></dt>
+<dd><p>Get a resource&#39;s metadata</p>
 </dd>
-<dt><a href="#getGraph">getGraph(url, [token])</a> ⇒ <code><a href="#Graph">Promise.&lt;Graph&gt;</a></code></dt>
-<dd><p>Get a graph by its URL. You can also request metadata graphs explicitly in with this function. However, you may also use the function &quot;getGraphMetadata&quot; for this purpose.</p>
+<dt><a href="#uploadGraph">uploadGraph(url, data, metadata, options, session)</a> ⇒ <code>Promise.&lt;IReturnMetadata&gt;</code></dt>
+<dd><p>Upload a graph (TTL) to your POD.</p>
 </dd>
-<dt><a href="#getGraphMetadata">getGraphMetadata(url, [token])</a> ⇒ <code><a href="#Metadata">Promise.&lt;Metadata&gt;</a></code></dt>
-<dd><p>Get the metadata graph of a given graph. You may either provide the &quot;.meta&quot; suffix or skip it.</p>
+<dt><a href="#uploadDocument">uploadDocument(url, data, metadata, options, session)</a> ⇒ <code>Promise.&lt;IReturnMetadata&gt;</code></dt>
+<dd><p>Upload a non-RDF resource to your POD.</p>
 </dd>
-<dt><a href="#deleteGraph">deleteGraph(url, [token])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
-<dd><p>Erase a project graph and its corresponding metadata graph from existence.</p>
+<dt><a href="#deleteResource">deleteResource(url, session)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
+<dd><p>Delete a resource</p>
 </dd>
-<dt><a href="#queryProjectSelect">queryProjectSelect(project, query, [token])</a> ⇒ <code><a href="#QueryResults">Promise.&lt;QueryResults&gt;</a></code></dt>
-<dd><p>Query a project with SPARQL SELECT. Only the graphs to which the user has access will be queried.</p>
+<dt><a href="#deleteGraph">deleteGraph(url, session)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
+<dd><p>Delete an RDF resource and its metadata</p>
 </dd>
-<dt><a href="#queryMultiple">queryMultiple(project, query, graphs, [token])</a> ⇒ <code><a href="#QueryResults">Promise.&lt;QueryResults&gt;</a></code></dt>
-<dd><p>Query multiple graphs with SPARQL SELECT.</p>
+<dt><a href="#deleteDocument">deleteDocument(url, session)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
+<dd><p>Delete an non-RDF resource and its metadata</p>
 </dd>
-<dt><a href="#queryGraphSelect">queryGraphSelect(url, query, [token])</a> ⇒ <code><a href="#QueryResults">QueryResults</a></code></dt>
-<dd><p>Query a graph with SPARQL SELECT.</p>
+<dt><a href="#createContainer">createContainer(url, session)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
+<dd><p>Create a container with a given url</p>
 </dd>
-<dt><a href="#updateGraph">updateGraph(url, query, [token])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
-<dd><p>Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.</p>
+<dt><a href="#getContainerContent">getContainerContent(url, session)</a> ⇒ <code>Promise.&lt;{containers: Array.&lt;string&gt;, resources: Array.&lt;string&gt;}&gt;</code></dt>
+<dd><p>Get the content of the container as an object with a list of resources and subcontainers.</p>
+</dd>
+<dt><a href="#uploadMetadataGraph">uploadMetadataGraph(url, data, options, session)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
+<dd><p>Upload the metadata graph for a given resource. Metadata graph urls will end with &quot;.props&quot;.</p>
+</dd>
+<dt><a href="#query">query(query, graphs, session)</a> ⇒ <code>Promise.&lt;Array.&lt;IQueryResult&gt;&gt;</code></dt>
+<dd><p>Query (SPARQL SELECT) a (set of) resource(s) with Comunica. As for now, only openly accessible graphs (i.e. Read permissions) can be queried</p>
+</dd>
+<dt><a href="#getPermissions">getPermissions(url, session)</a> ⇒ <code>Promise.&lt;Array.&lt;PermissionType&gt;&gt;</code></dt>
+<dd><p>Get the permissions for a specific resource. Placeholder until implemented (depends on authenticated or not). Only for UI purposes.</p>
+</dd>
+<dt><a href="#getLbdLocation">getLbdLocation(webId, session)</a> ⇒ <code>Promise.&lt;string&gt;</code></dt>
+<dd><p>Get the location where LBD projects are stored. At this point, standard &#39;./lbd/&#39; will be returned. Later phases may include more complex mechanisms such as Shape Tree discovery or Index Types. Authenticated sessions may thus be required in the future.</p>
+</dd>
+<dt><a href="#checkExistence">checkExistence(url, session)</a> ⇒ <code>Promise.&lt;boolean&gt;</code></dt>
+<dd><p>Check the existence of a resource (HEAD request to the given URL)</p>
 </dd>
 </dl>
-
-## Typedefs
-
-<dl>
-<dt><a href="#User">User</a> : <code>Object</code></dt>
-<dd></dd>
-<dt><a href="#returnUser">returnUser</a> : <code>Object</code></dt>
-<dd></dd>
-<dt><a href="#Metadata">Metadata</a> : <code>Object</code></dt>
-<dd></dd>
-<dt><a href="#Project">Project</a> : <code>Object</code></dt>
-<dd></dd>
-<dt><a href="#Resource">Resource</a></dt>
-<dd></dd>
-<dt><a href="#QueryResults">QueryResults</a> : <code>Object</code></dt>
-<dd></dd>
-<dt><a href="#Graph">Graph</a> : <code>Object</code></dt>
-<dd></dd>
-</dl>
-
-<a name="register"></a>
-
-## register(username, email, password) ⇒ [<code>Promise.&lt;returnUser&gt;</code>](#returnUser)
-Register as a user to the local LBDserver (backend defined in process.env.REACT_APP_BACKEND).
-
-**Kind**: global function  
-**Returns**: [<code>Promise.&lt;returnUser&gt;</code>](#returnUser) - Returns a User object and a token.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| username | <code>string</code> | Your username will be used to create a webID (personal URL) that can be used for access control in a Linked Data world. Should be unique. |
-| email | <code>string</code> | Your e-mail address. Should be unique. |
-| password | <code>string</code> | Your LBDserver passsword. |
 
 <a name="login"></a>
 
-## login(email, password) ⇒ [<code>Promise.&lt;returnUser&gt;</code>](#returnUser)
-Login as an existing user to the LBDserver (backend defined in process.env.REACT_APP_BACKEND)
+## login(oidcIssuer, redirectUrl, session) ⇒ <code>Promise.&lt;Session&gt;</code>
+Log in using OIDC and a Solid Session.
 
 **Kind**: global function  
-**Returns**: [<code>Promise.&lt;returnUser&gt;</code>](#returnUser) - Returns a User object and a token.  
+**Returns**: <code>Promise.&lt;Session&gt;</code> - Returns a Solid Session object  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| email | <code>string</code> | Your e-mail address. |
-| password | <code>string</code> | Your LBDserver password. |
+| oidcIssuer | <code>string</code> | uri for the OIDC issuer. E.g. 'https://broker.pod.inrupt.com'. |
+| redirectUrl | <code>string</code> | uri for redirect after login via OIDC. E.g. window.location.href. to return to the original page. |
+| session | <code>Session</code> | The solid session object. Will be returned, but if successful, the session will be authenticated and linked to the logged in user/webID. |
+
+<a name="register"></a>
+
+## register(oidcIssuer, redirecturi, session) ⇒ <code>Promise.&lt;Session&gt;</code>
+Log in using OIDC and a Solid Session.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;Session&gt;</code> - Returns a Solid Session object  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| oidcIssuer | <code>string</code> | uri for the OIDC issuer. E.g. 'https://broker.pod.inrupt.com'. |
+| redirecturi | <code>string</code> | uri for redirect after login via OIDC. E.g. window.location.href. to return to the original page. |
+| session | <code>Session</code> | The solid session object. Will be returned, but if successful, the session will be authenticated and linked to the logged in user/webID. |
+
+<a name="processSession"></a>
+
+## processSession(session) ⇒ <code>Promise.&lt;Session&gt;</code>
+Helper function to process the session after OIDC login. Retrieves the "code" from the current uri.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;Session&gt;</code> - Returns a Solid Session object  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| session | <code>Session</code> | The Solid Session object. |
 
 <a name="logout"></a>
 
-## logout(token) ⇒ <code>Promise.&lt;void&gt;</code>
-Log out on the LBDserver (backend defined in process.env.REACT_APP_BACKEND)
+## logout(session) ⇒ <code>Promise.&lt;Session&gt;</code>
+Log out from a Solid Session.
 
 **Kind**: global function  
+**Returns**: <code>Promise.&lt;Session&gt;</code> - Returns a Solid Session object  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| token | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
-
-<a name="getOpenProjects"></a>
-
-## getOpenProjects() ⇒ <code>Promise.&lt;Array.&lt;Project&gt;&gt;</code>
-Get all the documents accessible to unauthenticated users (public projects) on the local LBDserver (backend defined in process.env.REACT_APP_BACKEND)
-
-**Kind**: global function  
-<a name="getUserProjects"></a>
-
-## getUserProjects(token) ⇒ <code>Promise.&lt;Array.&lt;Project&gt;&gt;</code>
-Get all the projects associated with the currently authenticated user.
-
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| token | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| session | <code>Session</code> | The Solid Session object. |
 
 <a name="createProject"></a>
 
-## createProject(project, [token]) ⇒ [<code>Promise.&lt;Project&gt;</code>](#Project)
-Create a new project on the local LBDserver
+## createProject(stakeholders, session) ⇒ <code>Promise.&lt;ICreateProject&gt;</code>
+Create a new project environment. As the project ID is created here, the project metadata graph (.props) should be created afterwards (createGraph)
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| project | <code>Object.&lt;string, any&gt;</code> | The project object. |
-| project.title | <code>string</code> | The title "name" of the project. It will be registered in the project metadata graph of the project as rdfs:label. |
-| project.description | <code>string</code> | A small description of the project. It will be registered in the project metadata graph as rdfs:comment. |
-| project.open | <code>boolean</code> | Whether the project should be visible for the broader public or only for the creator. This is registered within the default ACL file (which can be changed afterwards as well). |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
-
-<a name="getOneProject"></a>
-
-## getOneProject(project, [token]) ⇒ [<code>Promise.&lt;Project&gt;</code>](#Project)
-Get a project by its URL or ID. If an ID is given, the URL is reconstructed via the backend URL defined in process.env.REACT_APP_BACKEND.
-
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| project | <code>string</code> | The URL or the ID of the project. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. Optional. |
+| stakeholders | <code>Array.&lt;IAgent&gt;</code> | Array of stakeholders to be involved in the project, as well as their access rights to the project in general. |
+| session | <code>Session</code> | The Solid Session object. |
 
 <a name="deleteProject"></a>
 
-## deleteProject(project, [token]) ⇒ <code>Promise.&lt;void&gt;</code>
-Delete a project by ID or URL. If an ID is provided; the URL is reconstructed based on the backend URL defined in process.env.REACT_APP_BACKEND.
+## deleteProject(uri, session) ⇒ <code>Promise.&lt;void&gt;</code>
+Delete an LBD project. The project will only be deleted in your own POD, of course.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| project | <code>string</code> | The URL or the ID of the project. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| uri | <code>string</code> | The uri of the project to delete in your repository. |
+| session | <code>Session</code> | The Solid Session object. |
 
-<a name="deleteResource"></a>
+<a name="getUserProjects"></a>
 
-## deleteResource(url, [token]) ⇒ <code>Promise.&lt;void&gt;</code>
-Delete a resource and its metadata graph.
-
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| url | <code>string</code> | The url of the resource. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
-
-<a name="uploadDocument"></a>
-
-## uploadDocument(props, project, [token]) ⇒ [<code>Promise.&lt;Metadata&gt;</code>](#Metadata)
-Upload a document to a defined project. Props include a "label", a "description" and a "resource", with the "resource" referring to the actual file to be uploaded. The "label" and "description" are used in the automatically created metadata file, which is equal to {fileurl}.meta.
+## getUserProjects(session) ⇒ <code>Promise.&lt;Array.&lt;IReturnProject&gt;&gt;</code>
+Get all the LBD projects in the POD of the authenticated user.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| props | <code>Object.&lt;string, any&gt;</code> | The properties of the object to be uploaded. |
-| props.label | <code>string</code> | A label for the resource. It will be registered in the metadata graph of the resource as rdfs:label. |
-| props.description | <code>string</code> | A description for the resource. It will be registered in the metadata graph of the resource as rdfs:comment. |
-| props.file | <code>Blob</code> | The file originating from a HTMLInputElement upload. Only one file at a time. |
-| [props.acl] | <code>string</code> \| <code>Blob</code> | An optional parameter to indicate the ACL graph for the resource. Can be a string pointing at the URL of an already existing ACL graph or a new ACL graph, uploaded via a HTMLInputElement. |
-| project | <code>string</code> | The URL or the ID of the project. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| session | <code>Session</code> | The Solid Session object. |
 
-<a name="getDocument"></a>
+<a name="getOneProject"></a>
 
-## getDocument(url, [token]) ⇒ <code>Promise.&lt;Buffer&gt;</code>
-Get a (non RDF) document from the LBDserver by providing its URL. Authenticate with a token.
+## getOneProject(uri, session) ⇒ <code>Promise.&lt;IReturnProject&gt;</code>
+Get a single project by its uri. From your local project, other stakeholders are determined and the federated project data you have access to is fetched.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| url | <code>string</code> | The URL of the requested resource. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| uri | <code>string</code> | The uri of the project. |
+| session | <code>Session</code> | The Solid Session object. |
 
-<a name="getDocumentMetadata"></a>
+<a name="getLocalProject"></a>
 
-## getDocumentMetadata(url, [token]) ⇒ [<code>Promise.&lt;Metadata&gt;</code>](#Metadata)
-Get the metadata of a document resource on the lbdserver. The url of the document should be provided; either with .meta or without (if without; the ".meta" suffix is automatically added).
-
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| url | <code>string</code> | The URL of the requested resource. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
-
-<a name="deleteDocument"></a>
-
-## deleteDocument(url, [token]) ⇒ <code>Promise.&lt;void&gt;</code>
-Erase a document (and its corresponding metadata graph) from existence.
+## getLocalProject(uri, session) ⇒ <code>Promise.&lt;IReturnProject&gt;</code>
+Get only the project data residing in your POD.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| url | <code>string</code> | The URL of the resource. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| uri | <code>string</code> | The uri of the project. |
+| session | <code>Session</code> | The Solid Session object. |
+
+<a name="getProjectResources"></a>
+
+## getProjectResources(uri, session) ⇒ <code>Promise.&lt;IReturnResources&gt;</code>
+Gets only the graphs and documents, without other project info (i.e. their metadata & permissions)
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| uri | <code>string</code> | The uri of the project. |
+| session | <code>Session</code> | The Solid Session object. |
+
+<a name="getOpenProjects"></a>
+
+## getOpenProjects(lbdLocation) ⇒ <code>Promise.&lt;Array.&lt;IReturnProject&gt;&gt;</code>
+Get the open projects on a specific LBDlocation.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| lbdLocation | <code>string</code> | The LBD project location to search for open projects |
+
+<a name="uploadResource"></a>
+
+## uploadResource(url, data, options, session) ⇒ <code>Promise.&lt;void&gt;</code>
+Upload a resource to your POD. You may also use uploadGraph and uploadDocument.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| url | <code>string</code> | the to-be url of the resource |
+| data | <code>Buffer</code> \| <code>string</code> | The data to be uploaded. Can be a buffer or a plain string. |
+| options | <code>Object</code> | Upload options |
+| [options.overwrite] | <code>boolean</code> | Whether the resource is an existing object that should be overwritten. |
+| [options.mimeType] | <code>string</code> | The mimetype of the resource. If not passed, the mimetype is guessed by the extension. If this files, the mimetype is st to 'text/plain'. |
+| session | <code>Session</code> | The Solid session object |
+
+<a name="getResource"></a>
+
+## getResource(uri, session) ⇒ <code>Promise.&lt;any&gt;</code>
+Get a resource actual data.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| uri | <code>string</code> | The uri of the project. |
+| session | <code>Session</code> | The Solid Session object. |
+
+<a name="getResourceMetadata"></a>
+
+## getResourceMetadata(uri, session) ⇒ <code>Promise.&lt;IReturnMetadata&gt;</code>
+Get a resource's metadata
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| uri | <code>string</code> | The uri of the project. |
+| session | <code>Session</code> | The Solid Session object. |
 
 <a name="uploadGraph"></a>
 
-## uploadGraph(props, project, [token]) ⇒ [<code>Promise.&lt;Metadata&gt;</code>](#Metadata)
-Upload an RDF graph to a defined project. Props include a "label", a "description" and a "resource", with the "resource" referring to the actual RDF graph to be uploaded. In the case no resource is passed, an empty graph gets created, using the label and description in the metadata, which is equal to {graphurl}.meta. A custom ACL graph or reference may be provided.
+## uploadGraph(url, data, metadata, options, session) ⇒ <code>Promise.&lt;IReturnMetadata&gt;</code>
+Upload a graph (TTL) to your POD.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| props | <code>Object.&lt;string, any&gt;</code> | The properties of the object to be uploaded. |
-| props.label | <code>string</code> | A label for the resource. It will be registered in the metadata graph of the resource as rdfs:label. |
-| props.description | <code>string</code> | A description for the resource. It will be registered in the metadata graph of the resource as rdfs:comment. |
-| props.file | <code>Blob</code> | The file originating from a HTMLInputElement upload. Only one file at a time. |
-| [props.acl] | <code>string</code> \| <code>Blob</code> | An optional parameter to indicate the ACL graph for the resource. Can be a string pointing at the URL of an already existing ACL graph or a new ACL graph, uploaded via a HTMLInputElement. |
-| project | <code>string</code> | The URL or the ID of the project. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| url | <code>string</code> | the to-be url of the resource |
+| data | <code>Buffer</code> \| <code>string</code> | The data to be uploaded. Can be a buffer or a plain string. |
+| metadata | <code>string</code> | The metadata graph as Turtle. |
+| options | <code>Object</code> | Upload options |
+| options.overwrite | <code>boolean</code> | Whether the resource is an existing object that should be overwritten. |
+| [options.mimeType] | <code>string</code> | The mimetype of the resource. If not passed, the mimetype is guessed by the extension. If this files, the mimetype is st to 'text/plain'. |
+| session | <code>Session</code> | The Solid session object |
 
-<a name="getGraph"></a>
+<a name="uploadDocument"></a>
 
-## getGraph(url, [token]) ⇒ [<code>Promise.&lt;Graph&gt;</code>](#Graph)
-Get a graph by its URL. You can also request metadata graphs explicitly in with this function. However, you may also use the function "getGraphMetadata" for this purpose.
-
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| url | <code>string</code> | The URL of the requested resource. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
-
-<a name="getGraphMetadata"></a>
-
-## getGraphMetadata(url, [token]) ⇒ [<code>Promise.&lt;Metadata&gt;</code>](#Metadata)
-Get the metadata graph of a given graph. You may either provide the ".meta" suffix or skip it.
+## uploadDocument(url, data, metadata, options, session) ⇒ <code>Promise.&lt;IReturnMetadata&gt;</code>
+Upload a non-RDF resource to your POD.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| url | <code>string</code> | The URL of the resource corresponding with the metadata graph or the URL of the metadata graph itself. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| url | <code>string</code> | the to-be url of the resource |
+| data | <code>Buffer</code> \| <code>string</code> | The data to be uploaded. Can be a buffer or a plain string. |
+| metadata | <code>string</code> | The metadata graph as Turtle. |
+| options | <code>Object</code> | Upload options |
+| options.overwrite | <code>boolean</code> | Whether the resource is an existing object that should be overwritten. |
+| [options.mimeType] | <code>string</code> | The mimetype of the resource. If not passed, the mimetype is guessed by the extension. If this files, the mimetype is st to 'text/plain'. |
+| session | <code>Session</code> | The Solid session object |
+
+<a name="deleteResource"></a>
+
+## deleteResource(url, session) ⇒ <code>Promise.&lt;void&gt;</code>
+Delete a resource
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| url | <code>string</code> | The url of the resource to be deleted |
+| session | <code>Session</code> | The Solid session object |
 
 <a name="deleteGraph"></a>
 
-## deleteGraph(url, [token]) ⇒ <code>Promise.&lt;void&gt;</code>
-Erase a project graph and its corresponding metadata graph from existence.
+## deleteGraph(url, session) ⇒ <code>Promise.&lt;void&gt;</code>
+Delete an RDF resource and its metadata
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| url | <code>string</code> | The URL of the resource. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| url | <code>string</code> | The url of the resource to be deleted |
+| session | <code>Session</code> | The Solid session object |
 
-<a name="queryProjectSelect"></a>
+<a name="deleteDocument"></a>
 
-## queryProjectSelect(project, query, [token]) ⇒ [<code>Promise.&lt;QueryResults&gt;</code>](#QueryResults)
-Query a project with SPARQL SELECT. Only the graphs to which the user has access will be queried.
-
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| project | <code>string</code> | The URL or the ID of the project. |
-| query | <code>string</code> | A SPARQL select query. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
-
-<a name="queryMultiple"></a>
-
-## queryMultiple(project, query, graphs, [token]) ⇒ [<code>Promise.&lt;QueryResults&gt;</code>](#QueryResults)
-Query multiple graphs with SPARQL SELECT.
+## deleteDocument(url, session) ⇒ <code>Promise.&lt;void&gt;</code>
+Delete an non-RDF resource and its metadata
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| project | <code>string</code> | The URL or the ID of the project. |
-| query | <code>string</code> | A SPARQL select query. |
-| graphs | <code>Array.&lt;string&gt;</code> | An array of the graphs that are to be included in the query. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| url | <code>string</code> | The url of the resource to be deleted |
+| session | <code>Session</code> | The Solid session object |
 
-<a name="queryGraphSelect"></a>
+<a name="createContainer"></a>
 
-## queryGraphSelect(url, query, [token]) ⇒ [<code>QueryResults</code>](#QueryResults)
-Query a graph with SPARQL SELECT.
+## createContainer(url, session) ⇒ <code>Promise.&lt;void&gt;</code>
+Create a container with a given url
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| url | <code>string</code> | The url of the graph to be queried. |
-| query | <code>string</code> | A SPARQL select query. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| url | <code>string</code> | The url of the container to be created |
+| session | <code>Session</code> | The Solid session object |
 
-<a name="updateGraph"></a>
+<a name="getContainerContent"></a>
 
-## updateGraph(url, query, [token]) ⇒ <code>Promise.&lt;void&gt;</code>
-Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.
+## getContainerContent(url, session) ⇒ <code>Promise.&lt;{containers: Array.&lt;string&gt;, resources: Array.&lt;string&gt;}&gt;</code>
+Get the content of the container as an object with a list of resources and subcontainers.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| url | <code>string</code> | The url of the graph to be updated. |
-| query | <code>string</code> | A SPARQL INSERT/DELETE query. |
-| [token] | <code>string</code> | The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function. |
+| url | <code>string</code> | The url of the container |
+| session | <code>Session</code> | The Solid session object |
 
-<a name="User"></a>
+<a name="uploadMetadataGraph"></a>
 
-## User : <code>Object</code>
-**Kind**: global typedef  
-**Properties**
+## uploadMetadataGraph(url, data, options, session) ⇒ <code>Promise.&lt;void&gt;</code>
+Upload the metadata graph for a given resource. Metadata graph urls will end with ".props".
 
-| Name | Type |
-| --- | --- |
-| username | <code>string</code> | 
-| email | <code>string</code> | 
-| projects | <code>Array.&lt;string&gt;</code> | 
-| uri | <code>string</code> | 
+**Kind**: global function  
 
-<a name="returnUser"></a>
-
-## returnUser : <code>Object</code>
-**Kind**: global typedef  
-**Properties**
-
-| Name | Type |
-| --- | --- |
-| user | [<code>User</code>](#User) | 
-| token | <code>string</code> | 
-
-<a name="Metadata"></a>
-
-## Metadata : <code>Object</code>
-**Kind**: global typedef  
-**Properties**
-
-| Name | Type | Description |
+| Param | Type | Description |
 | --- | --- | --- |
-| uri | <code>string</code> | URI of the document |
-| metadata | <code>Object</code> | The metadata as JSON-LD. |
+| url | <code>string</code> | The url of the resource (if it doesn't end with ".props", the suffix is added automatically) |
+| data | <code>string</code> | The metadata as Turtle |
+| options | <code>Object</code> | Options for uploading |
+| options.overwrite | <code>boolean</code> | Whether the resource is an existing object that should be overwritten. |
+| [options.mimeType] | <code>string</code> | The mimetype of the resource. If not passed, the mimetype is guessed by the extension. If this files, the mimetype is st to 'text/plain'. |
+| session | <code>Session</code> | The Solid session object |
 
-<a name="Project"></a>
+<a name="query"></a>
 
-## Project : <code>Object</code>
-**Kind**: global typedef  
-**Properties**
+## query(query, graphs, session) ⇒ <code>Promise.&lt;Array.&lt;IQueryResult&gt;&gt;</code>
+Query (SPARQL SELECT) a (set of) resource(s) with Comunica. As for now, only openly accessible graphs (i.e. Read permissions) can be queried
 
-| Name | Type | Description |
+**Kind**: global function  
+
+| Param | Type | Description |
 | --- | --- | --- |
-| metadata | <code>Object</code> | A JSON-LD object of the project metadata |
-| id | <code>string</code> | The project id |
-| [uri] | <code>string</code> | The project uri. Optional (only when creating a project => otherwise it is just the url of the request) |
-| graphs | [<code>Resource</code>](#Resource) | An object containing all the graphs in the project. The object key is the graph url, the value is its metadata as JSON-LD. |
-| documents | [<code>Resource</code>](#Resource) | An object containing all the documents in the project. The object key is the document url, the value is its metadata as JSON-LD. |
-| [results] | [<code>QueryResults</code>](#QueryResults) | the result of an eventual SPARQL SELECT query. Only if a query was sent along. |
+| query | <code>string</code> | The SPARQL query string |
+| graphs | <code>Array.&lt;string&gt;</code> | The resources to be queried as an Array |
+| session | <code>Session</code> | The Solid session object |
 
-<a name="Resource"></a>
+<a name="getPermissions"></a>
 
-## Resource
-**Kind**: global typedef  
-**Properties**
+## getPermissions(url, session) ⇒ <code>Promise.&lt;Array.&lt;PermissionType&gt;&gt;</code>
+Get the permissions for a specific resource. Placeholder until implemented (depends on authenticated or not). Only for UI purposes.
 
-| Name | Type |
-| --- | --- |
-| metadata | <code>Object</code> | 
-| permissions | <code>Array.&lt;string&gt;</code> | 
+**Kind**: global function  
 
-<a name="QueryResults"></a>
-
-## QueryResults : <code>Object</code>
-**Kind**: global typedef  
-**Properties**
-
-| Name | Type | Description |
+| Param | Type | Description |
 | --- | --- | --- |
-| head | <code>Object</code> |  |
-| head.vars | <code>Array.&lt;string&gt;</code> |  |
-| results | <code>Object</code> |  |
-| results.bindings | <code>Array.&lt;Object&gt;</code> | links the variables to the results. |
+| url | <code>string</code> | The url |
+| session | <code>Session</code> | The Solid session object |
 
-<a name="Graph"></a>
+<a name="getLbdLocation"></a>
 
-## Graph : <code>Object</code>
-**Kind**: global typedef  
-**Properties**
+## getLbdLocation(webId, session) ⇒ <code>Promise.&lt;string&gt;</code>
+Get the location where LBD projects are stored. At this point, standard './lbd/' will be returned. Later phases may include more complex mechanisms such as Shape Tree discovery or Index Types. Authenticated sessions may thus be required in the future.
 
-| Name | Type | Description |
+**Kind**: global function  
+
+| Param | Type | Description |
 | --- | --- | --- |
-| uri | <code>string</code> | URI of the document |
-| metadata | <code>Object</code> | The metadata as JSON-LD. |
-| data | <code>Object</code> | The graph content as JSON-LD |
+| webId | <code>string</code> | The web id to find the LBD location for. |
+| session | <code>Session</code> | The Solid session object |
+
+<a name="checkExistence"></a>
+
+## checkExistence(url, session) ⇒ <code>Promise.&lt;boolean&gt;</code>
+Check the existence of a resource (HEAD request to the given URL)
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| url | <code>string</code> | The url of the resource |
+| session | <code>Session</code> | The Solid session object |
 

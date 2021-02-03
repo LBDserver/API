@@ -99,19 +99,12 @@ async function logout(token) {
  * @property {string} [uri] The project uri. Optional (only when creating a project => otherwise it is just the url of the request)
  * @property {Resource} graphs An object containing all the graphs in the project. The object key is the graph url, the value is its metadata as JSON-LD.
  * @property {Resource} documents An object containing all the documents in the project. The object key is the document url, the value is its metadata as JSON-LD.
- * @property {QueryResults} [results] the result of an eventual SPARQL SELECT query. Only if a query was sent along.
+ * @property {QueryResult[]} [results] the result of an eventual SPARQL SELECT query. Only if a query was sent along.
  */
 /**
  * @typedef Resource
  * @property {Object} metadata
  * @property {string[]} permissions
- */
-/**
- * @typedef {Object} QueryResults
- * @property {Object} head
- * @property {string[]} head.vars
- * @property {Object} results
- * @property {Object[]} results.bindings links the variables to the results.
  */
 //////////////////// PROJECT FUNCTIONS ////////////////////
 /**
@@ -518,7 +511,7 @@ async function deleteGraph(url, token) {
  * @param {string} project The URL or the ID of the project.
  * @param {string} query A SPARQL select query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Promise<QueryResults>}
+ * @returns {Promise<QueryResult[]>}
  */
 async function queryProjectSelect(project, query, token) {
     try {
@@ -550,7 +543,7 @@ async function queryProjectSelect(project, query, token) {
  * @param {string} query A SPARQL select query.
  * @param {string[]} graphs An array of the graphs that are to be included in the query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Promise<QueryResults>}
+ * @returns {Promise<QueryResult[]>}
  */
 async function queryMultiple(project, query, graphs, token) {
     try {
@@ -593,7 +586,7 @@ async function queryMultiple(project, query, graphs, token) {
  * @param {string} url The url of the graph to be queried.
  * @param {string} query A SPARQL select query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @return {QueryResults}
+ * @return {QueryResult[]}
  */
 async function queryGraphSelect(url, query, token) {
     try {

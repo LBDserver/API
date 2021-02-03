@@ -48,19 +48,12 @@ declare function logout(token: string): Promise<void>;
  * @property {string} [uri] The project uri. Optional (only when creating a project => otherwise it is just the url of the request)
  * @property {Resource} graphs An object containing all the graphs in the project. The object key is the graph url, the value is its metadata as JSON-LD.
  * @property {Resource} documents An object containing all the documents in the project. The object key is the document url, the value is its metadata as JSON-LD.
- * @property {QueryResults} [results] the result of an eventual SPARQL SELECT query. Only if a query was sent along.
+ * @property {QueryResult[]} [results] the result of an eventual SPARQL SELECT query. Only if a query was sent along.
  */
 /**
  * @typedef Resource
  * @property {Object} metadata
  * @property {string[]} permissions
- */
-/**
- * @typedef {Object} QueryResults
- * @property {Object} head
- * @property {string[]} head.vars
- * @property {Object} results
- * @property {Object[]} results.bindings links the variables to the results.
  */
 /**
  * Get all the documents accessible to unauthenticated users (public projects) on the local LBDserver (backend defined in process.env.REACT_APP_BACKEND)
@@ -180,26 +173,26 @@ declare function deleteGraph(url: string, token?: string): Promise<void>;
  * @param {string} project The URL or the ID of the project.
  * @param {string} query A SPARQL select query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Promise<QueryResults>}
+ * @returns {Promise<QueryResult[]>}
  */
-declare function queryProjectSelect(project: string, query: string, token?: string): Promise<PROJECT.IQueryResults>;
+declare function queryProjectSelect(project: string, query: string, token?: string): Promise<PROJECT.IQueryResult[]>;
 /**
  * Query multiple graphs with SPARQL SELECT.
  * @param {string} project The URL or the ID of the project.
  * @param {string} query A SPARQL select query.
  * @param {string[]} graphs An array of the graphs that are to be included in the query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @returns {Promise<QueryResults>}
+ * @returns {Promise<QueryResult[]>}
  */
-declare function queryMultiple(project: string, query: string, graphs: string[], token?: string): Promise<PROJECT.IQueryResults>;
+declare function queryMultiple(project: string, query: string, graphs: string[], token?: string): Promise<PROJECT.IQueryResult[]>;
 /**
  * Query a graph with SPARQL SELECT.
  * @param {string} url The url of the graph to be queried.
  * @param {string} query A SPARQL select query.
  * @param {string} [token] The access token you got from logging in. You don't need to pass the "Bearer" suffix - it is added within the function.
- * @return {QueryResults}
+ * @return {QueryResult[]}
  */
-declare function queryGraphSelect(url: string, query: string, token?: string): Promise<PROJECT.IQueryResults>;
+declare function queryGraphSelect(url: string, query: string, token?: string): Promise<PROJECT.IQueryResult[]>;
 /**
  * Update a named graph in the project (SPARQL INSERT/DELETE). Be careful.
  * @param {string} url The url of the graph to be updated.

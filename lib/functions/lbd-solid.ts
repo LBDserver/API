@@ -5,7 +5,7 @@ import { IAgent, PermissionType } from '../interfaces/consolidInterface'
 import { aclTemplate, stakeholderTemplate } from '../templates'
 import {Session} from '@inrupt/solid-client-authn-browser'
 import mime from 'mime-types'
-import { IReturnMetadata, IReturnProject } from '../interfaces/projectInterface'
+import { ICreateProject, IQueryResult, IReturnMetadata, IReturnProject, IReturnResources } from '../interfaces/projectInterface'
 
 import {query as queryJS} from '../helperfunctions/query'
 
@@ -20,8 +20,8 @@ const URL = (typeof window !== 'undefined' && window.URL)
 
 /**
  * Log in using OIDC and a Solid Session.
- * @param {string} oidcIssuer URL for the OIDC issuer. E.g. 'https://broker.pod.inrupt.com'.
- * @param {string} redirectUrl URL for redirect after login via OIDC. E.g. window.location.href. to return to the original page.
+ * @param {string} oidcIssuer uri for the OIDC issuer. E.g. 'https://broker.pod.inrupt.com'.
+ * @param {string} redirectUrl uri for redirect after login via OIDC. E.g. window.location.href. to return to the original page.
  * @param {Session} session The solid session object. Will be returned, but if successful, the session will be authenticated and linked to the logged in user/webID.
  * @returns {Promise<Session>} Returns a Solid Session object
  */
@@ -42,12 +42,12 @@ async function login(oidcIssuer: string, redirectUrl: string, session: Session):
 
 /**
  * Log in using OIDC and a Solid Session.
- * @param {string} oidcIssuer URL for the OIDC issuer. E.g. 'https://broker.pod.inrupt.com'.
- * @param {string} redirectUrl URL for redirect after login via OIDC. E.g. window.location.href. to return to the original page.
+ * @param {string} oidcIssuer uri for the OIDC issuer. E.g. 'https://broker.pod.inrupt.com'.
+ * @param {string} redirecturi uri for redirect after login via OIDC. E.g. window.location.href. to return to the original page.
  * @param {Session} session The solid session object. Will be returned, but if successful, the session will be authenticated and linked to the logged in user/webID.
  * @returns {Promise<Session>} Returns a Solid Session object
  */
-async function register(oidcIssuer: string, redirectUrl: string, session: Session): Promise<Session> {
+async function register(oidcIssuer: string, redirecturi: string, session: Session): Promise<Session> {
     try {
         throw new Error(`not implemented in Solid LBD server environment`)
     } catch (error) {
@@ -57,7 +57,7 @@ async function register(oidcIssuer: string, redirectUrl: string, session: Sessio
 }
 
 /**
- * Helper function to process the session after OIDC login. Retrieves the "code" from the current url.
+ * Helper function to process the session after OIDC login. Retrieves the "code" from the current uri.
  * @param {Session} session The Solid Session object. 
  * @returns {Promise<Session>} Returns a Solid Session object
  */
@@ -92,24 +92,25 @@ async function logout(session: Session): Promise<Session> {
 
 
 /////////////////////// PROJECT FUNCTIONS ///////////////////////
+
 /**
- * 
- * @param {string} metadata a valid TTL string for the metadata of the project. Should contain default metadata such as rdfs:label, rdfs:comment. NOTE: in later versions, will be checked with SHACL shape
+ * Create a new project environment. As the project ID is created here, the project metadata graph (.props) should be created afterwards (createGraph)
  * @param {Array<IAgent>} stakeholders Array of stakeholders to be involved in the project, as well as their access rights to the project in general.
- * @param {Session} session 
+ * @param {Session} session The Solid Session object. 
+ * @returns {Promise<ICreateProject>}
  */
-async function createProject(stakeholders: Array<IAgent>, session: Session): Promise<any> {
+async function createProject(stakeholders: Array<IAgent>, session: Session): Promise<ICreateProject> {
     try {
         // whenever CSS is an ID provider as well ...
-        // const myUrl = new URL(session.info.webId)
+        // const myuri = new URL(session.info.webId)
 
         // for now: 
-        const myUrl = new URL('http://localhost:3000')
+        const myuri = new URL('http://localhost:3000')
 
         // check if a dedicated folder exists for lbd projects (if not: create one)
-        let lbdLocation = await getLbdLocation(session.info.webId)
+        let lbdLocation = await getLbdLocation(session.info.webId, session)
         if (!lbdLocation) {
-            lbdLocation = `${myUrl.origin}/lbd/`
+            lbdLocation = `${myuri.origin}/lbd/`
             await createContainer(lbdLocation, session)
         }
 
@@ -149,11 +150,17 @@ async function createProject(stakeholders: Array<IAgent>, session: Session): Pro
     }
 }
 
-async function deleteProject(url: string,session: Session): Promise<void> {
+/**
+ * Delete an LBD project. The project will only be deleted in your own POD, of course.
+ * @param {string} uri The uri of the project to delete in your repository. 
+ * @param {Session} session The Solid Session object. 
+ * @returns {Promise<void>}
+ */
+async function deleteProject(uri: string,session: Session): Promise<void> {
     try {
-        const {containers, resources} = await getContainerContent(url, session)
+        const {containers, resources} = await getContainerContent(uri, session)
         for (const container of containers) {
-            if (container !== url) {
+            if (container !== uri) {
                 const {containers, resources} = await getContainerContent(container, session)
                 for (const res of resources) {
                     await deleteResource(res, session)
@@ -164,7 +171,7 @@ async function deleteProject(url: string,session: Session): Promise<void> {
         for (const res of resources) {
             await deleteResource(res, session)
         }
-        await deleteResource(url, session)
+        await deleteResource(uri, session)
         return
     } catch (error) {
         error.message = `Could not delete project - ${error.message}`
@@ -172,19 +179,14 @@ async function deleteProject(url: string,session: Session): Promise<void> {
     }
 }
 
-// interface IReturnProject {
-//     metadata: string;
-//     id: string;
-//     uri: string;
-//     graphs: IResourceObject;
-//     documents: IResourceObject;
-//     permissions: string[];
-//     results?: IQueryResults;
-// }
-
+/**
+ * Get all the LBD projects in the POD of the authenticated user.
+ * @param {Session} session The Solid Session object. 
+ * @returns {Promise<IReturnProject[]>}
+ */
 async function getUserProjects(session: Session): Promise<IReturnProject[]> {
     try {
-        const lbdLocation = await getLbdLocation(session.info.webId)
+        const lbdLocation = await getLbdLocation(session.info.webId, session)
         const {containers, resources} = await getContainerContent(lbdLocation, session)
         const projects = []
         for (const container of containers) {
@@ -201,6 +203,12 @@ async function getUserProjects(session: Session): Promise<IReturnProject[]> {
     }
 }
 
+/**
+ * Get a single project by its uri. From your local project, other stakeholders are determined and the federated project data you have access to is fetched. 
+ * @param {string} uri The uri of the project. 
+ * @param {Session} session The Solid Session object. 
+ * @returns {Promise<IReturnProject>}
+ */
 async function getOneProject(uri: string, session: Session): Promise<IReturnProject> {
     try {
         // get the information the authenticated agent himself has about the project (e.g. to fetch the other stakeholders)
@@ -211,20 +219,30 @@ async function getOneProject(uri: string, session: Session): Promise<IReturnProj
         for (const st of stakeholderList) {
             const webId = st["st"].value
             if (webId !== session.info.webId) {
-                const projectLocation = await getLbdLocation(webId)
-                const {graphs, documents} = await getLocalProject(`${projectLocation}${project.id}/`, session)
-                project.graphs = {...project.graphs, ...graphs}
-                project.documents = {...project.documents, ...documents}
+                try {
+                    const projectLocation = await getLbdLocation(webId, session)
+                    const {graphs, documents} = await getLocalProject(`${projectLocation}${project.id}/`, session)
+                    project.graphs = {...project.graphs, ...graphs}
+                    project.documents = {...project.documents, ...documents}
+                } catch (error) {
+                    error.message = `Could not retrieve project data from ${webId} - ${error.message}`
+                }
             }            
         }
 
         return project
     } catch (error) {
-        error.message = `Unable to get project with url ${uri} - ${error.message}`
+        error.message = `Unable to get project with uri ${uri} - ${error.message}`
         throw error
     }
 }
 
+/**
+ * Get only the project data residing in your POD.
+ * @param {string} uri The uri of the project. 
+ * @param {Session} session The Solid Session object. 
+ * @returns {Promise<IReturnProject>}
+ */
 async function getLocalProject(uri: string, session: Session): Promise<IReturnProject> {
     try {
         const id = uri.split('/')[uri.split('/').length - 2]
@@ -242,12 +260,18 @@ async function getLocalProject(uri: string, session: Session): Promise<IReturnPr
         
         return project
     } catch (error) {
-        error.message = `Unable to get local project with url ${uri} - ${error.message}`
+        error.message = `Unable to get local project with uri ${uri} - ${error.message}`
         throw error
     }
 }
 
-async function getProjectResources(uri, session): Promise<{graphs: {[x:string]: any}, documents: {[x:string]: any}}> {
+/**
+ * Gets only the graphs and documents, without other project info (i.e. their metadata & permissions)
+ * @param {string} uri The uri of the project. 
+ * @param {Session} session The Solid Session object. 
+ * @returns {Promise<IReturnResources>}
+ */
+async function getProjectResources(uri, session): Promise<IReturnResources> {
     try {
         const id = uri.split('/')[uri.split('/').length - 2]
         const {resources: fileList} = await getContainerContent(`${uri}files/`, session)
@@ -282,15 +306,19 @@ async function getProjectResources(uri, session): Promise<{graphs: {[x:string]: 
 
         return projectResources
     } catch (error) {
-        error.message = `Unable to get local project with url ${uri} - ${error.message}`
+        error.message = `Unable to get local project with uri ${uri} - ${error.message}`
         throw error
     }
 }
 
-async function getOpenProjects() {
+/**
+ * Get the open projects on a specific LBDlocation.
+ * @param {string} lbdLocation The LBD project location to search for open projects
+ * @returns {Promise<IReturnProject[]>}
+ */
+async function getOpenProjects(lbdLocation): Promise<IReturnProject[]> {
     try {
         const session = new Session()
-        const lbdLocation = "http://localhost:3000/lbd/"
         const {containers} = await getContainerContent(lbdLocation, session)
         const projects = []
         for (const container of containers) {
@@ -302,22 +330,33 @@ async function getOpenProjects() {
         }
         return projects
     } catch (error) {
-        error.message = `Could not get open projects - ${error.message}`
+        error.message = `Could not get open projects at LBDlocation ${lbdLocation} - ${error.message}`
         throw error
     }
 }
 
 /////////////////////// RESOURCE FUNCTIONS //////////////////////
-async function uploadResource(url: string, data: Buffer | string, options, session: Session): Promise<void> {
+/**
+ * Upload a resource to your POD. You may also use uploadGraph and uploadDocument.
+ * @param {string} url the to-be url of the resource
+ * @param {Buffer | string} data The data to be uploaded. Can be a buffer or a plain string.
+ * @param {Object} options Upload options
+ * @param {boolean} [options.overwrite] Whether the resource is an existing object that should be overwritten.
+ * @param {string} [options.mimeType] The mimetype of the resource. If not passed, the mimetype is guessed by the extension. If this files, the mimetype is st to 'text/plain'.
+ * @param {Session} session The Solid session object
+ * @returns {Promise<void>}
+ */
+async function uploadResource(url: string, data: Buffer | string, options: {overwrite?: boolean, mimeType?: string}, session: Session): Promise<void> {
+    try {
         if (!options.overwrite) {
             // check if graph does not exist yet  
-            const exists = await checkExistence(url)
+            const exists = await checkExistence(url, session)
             if (exists) {
                 throw new Error("Resource already exists")
             }
         }
 
-        //content-type is guessed by url (default: text/plain)
+        //content-type is guessed by uri (default: text/plain)
         let mimeType
         if (!options.mimeType) {
             mimeType = mime.lookup(url)
@@ -343,66 +382,107 @@ async function uploadResource(url: string, data: Buffer | string, options, sessi
             redirect: 'follow' as RequestRedirect
         };
 
-        const response = await session.fetch(url, requestOptions)
-        const text = await response.text()
+        await session.fetch(url, requestOptions)
         return
-
-}
-
-async function getResource(url: string, session: Session) {
-    try {
-        const resource = await session.fetch(url)
-        return resource
     } catch (error) {
-        error.message = `Unable to fetch resource with url ${url} - ${error.message}`
+        error.message = `Unable to upload resource - ${error.message}`
         throw error
     }
 }
 
-async function getResourceMetadata(url: string, session: Session) {
+/**
+ * Get a resource actual data.
+ * @param {string} uri The uri of the project. 
+ * @param {Session} session The Solid Session object. 
+ * @returns {Promise<any>}
+ */
+async function getResource(uri: string, session: Session): Promise<any> {
     try {
-        const permissions = await getPermissions(url, session)
+        const resource = await session.fetch(uri)
+        return resource
+    } catch (error) {
+        error.message = `Unable to fetch resource with uri ${uri} - ${error.message}`
+        throw error
+    }
+}
+
+/**
+ * Get a resource's metadata
+ * @param {string} uri The uri of the project. 
+ * @param {Session} session The Solid Session object. 
+ * @returns {Promise<IReturnMetadata>}
+ */
+async function getResourceMetadata(uri: string, session: Session): Promise<IReturnMetadata> {
+    try {
+        const permissions = await getPermissions(uri, session)
         if (!permissions.includes("http://www.w3.org/ns/auth/acl#Read")) {
-            throw new Error(`No acl:Read rights for resource with url ${url}`)
+            throw new Error(`No acl:Read rights for resource with uri ${uri}`)
         }
 
-        const metadataRaw = await session.fetch(`${url}.props`)
+        const metadataRaw = await session.fetch(`${uri}.props`)
         const metadata = await metadataRaw.text()
         return {metadata, permissions}
     
     } catch (error) {
-        error.message = `Unable to fetch resource with url ${url} - ${error.message}`
+        error.message = `Unable to fetch resource with uri ${uri} - ${error.message}`
         throw error
     }
 }
 
-
-async function uploadGraph(url, data, metadata, options, session: Session): Promise<IReturnMetadata> {
+/**
+ * Upload a graph (TTL) to your POD.
+ * @param {string} url the to-be url of the resource
+ * @param {Buffer | string} data The data to be uploaded. Can be a buffer or a plain string.
+ * @param {string} metadata The metadata graph as Turtle.
+ * @param {Object} options Upload options
+ * @param {boolean} options.overwrite Whether the resource is an existing object that should be overwritten.
+ * @param {string} [options.mimeType] The mimetype of the resource. If not passed, the mimetype is guessed by the extension. If this files, the mimetype is st to 'text/plain'.
+ * @param {Session} session The Solid session object
+ * @returns {Promise<IReturnMetadata>}
+ */
+async function uploadGraph(url: string, data: Buffer | string, metadata: string, options: {overwrite: boolean, mimeType: string}, session: Session): Promise<IReturnMetadata> {
     try {
         await validateTTL(metadata)
         await uploadResource(url, data, options, session)
         await uploadResource(url + '.props', metadata, {...options, mimeType: "text/turtle"}, session)
 
-        return {uri: url, metadata, permissions: ["http://www.w3.org/ns/auth/acl#Read", "http://www.w3.org/ns/auth/acl#Write", "http://www.w3.org/ns/auth/acl#Append", "http://www.w3.org/ns/auth/acl#Control"]}
+        return {metadata, permissions: ["http://www.w3.org/ns/auth/acl#Read", "http://www.w3.org/ns/auth/acl#Write", "http://www.w3.org/ns/auth/acl#Append", "http://www.w3.org/ns/auth/acl#Control"]}
     } catch (error) {
         error.message = `Could not create graph - ${error.message}`
         throw error
     }
 }
 
-async function uploadDocument(url, data: Buffer | string, metadata: string, options, session: Session): Promise<IReturnMetadata> {
+/**
+ * Upload a non-RDF resource to your POD.
+ * @param {string} url the to-be url of the resource
+ * @param {Buffer | string} data The data to be uploaded. Can be a buffer or a plain string.
+ * @param {string} metadata The metadata graph as Turtle.
+ * @param {Object} options Upload options
+ * @param {boolean} options.overwrite Whether the resource is an existing object that should be overwritten.
+ * @param {string} [options.mimeType] The mimetype of the resource. If not passed, the mimetype is guessed by the extension. If this files, the mimetype is st to 'text/plain'.
+ * @param {Session} session The Solid session object
+ * @returns {Promise<IReturnMetadata>}
+ */
+async function uploadDocument(url, data: Buffer | string, metadata: string, options: {overwrite: boolean, mimeType: string}, session: Session): Promise<IReturnMetadata> {
     try {
         await validateTTL(metadata)
         await uploadResource(url, data, options, session)
         await uploadResource(url + '.props', metadata, {...options, mimeType: "text/turtle"}, session)
-        return {uri: url, metadata, permissions: ["http://www.w3.org/ns/auth/acl#Read", "http://www.w3.org/ns/auth/acl#Write", "http://www.w3.org/ns/auth/acl#Append", "http://www.w3.org/ns/auth/acl#Control"]}
+        return {metadata, permissions: ["http://www.w3.org/ns/auth/acl#Read", "http://www.w3.org/ns/auth/acl#Write", "http://www.w3.org/ns/auth/acl#Append", "http://www.w3.org/ns/auth/acl#Control"]}
     } catch (error) {
         error.message = `Could not upload document - ${error.message}`
         throw error
     }
 }
 
-async function deleteResource(url, session: Session): Promise<void> {
+/**
+ * Delete a resource
+ * @param {string} url The url of the resource to be deleted
+ * @param {Session} session The Solid session object
+ * @returns {Promise<void>}
+ */
+async function deleteResource(url: string, session: Session): Promise<void> {
     try {
         var requestOptions = {
             method: 'DELETE',
@@ -416,21 +496,40 @@ async function deleteResource(url, session: Session): Promise<void> {
     }
 }
 
+
+/**
+ * Delete an RDF resource and its metadata
+ * @param {string} url The url of the resource to be deleted
+ * @param {Session} session The Solid session object
+ * @returns {Promise<void>}
+ */
 async function deleteGraph(url, session: Session): Promise<void> {
     await deleteResource(url, session)
     await deleteResource(url + '.props', session)
 }
 
+/**
+ * Delete an non-RDF resource and its metadata
+ * @param {string} url The url of the resource to be deleted
+ * @param {Session} session The Solid session object
+ * @returns {Promise<void>}
+ */
 async function deleteDocument(url, session: Session): Promise<void> {
     await deleteResource(url, session)
     await deleteResource(url + '.props', session)
 }
 
-async function createContainer(url, session: Session): Promise<void> {
+/**
+ * Create a container with a given url
+ * @param {string} url The url of the container to be created
+ * @param {Session} session The Solid session object
+ * @returns {Promise<void>}
+ */
+async function createContainer(url: string, session: Session): Promise<void> {
     try {
 
         if (!url.endsWith("/")) {
-            throw new Error('Url must end with a "/"')
+            url = url.concat('/')
         }
 
         const requestOptions: RequestInit = {
@@ -441,15 +540,21 @@ async function createContainer(url, session: Session): Promise<void> {
         redirect: 'follow'
         };
 
-        const response = await session.fetch(url, requestOptions)
-        const text = await response.text()
+        await session.fetch(url, requestOptions)
+        return
     } catch (error) {
         error.message = `Unable to create container - ${error.message}`
         throw error
     }
 }
 
-async function getContainerContent(url, session): Promise<{containers: string[], resources: string[]}> {
+/**
+ * Get the content of the container as an object with a list of resources and subcontainers.
+ * @param {string} url The url of the container
+ * @param {Session} session The Solid session object
+ * @returns {Promise<{containers: string[], resources: string[]}>}
+ */
+async function getContainerContent(url: string, session: Session): Promise<{containers: string[], resources: string[]}> {
     try {
                 // fetch all resources in the container
                 const containers = []
@@ -483,7 +588,17 @@ async function getContainerContent(url, session): Promise<{containers: string[],
     }
 }
 
-async function uploadMetadataGraph(url, data, options, session: Session): Promise<void> {
+/**
+ * Upload the metadata graph for a given resource. Metadata graph urls will end with ".props".
+ * @param {string} url The url of the resource (if it doesn't end with ".props", the suffix is added automatically)
+ * @param {string} data The metadata as Turtle
+ * @param {Object} options Options for uploading
+ * @param {boolean} options.overwrite Whether the resource is an existing object that should be overwritten.
+ * @param {string} [options.mimeType] The mimetype of the resource. If not passed, the mimetype is guessed by the extension. If this files, the mimetype is st to 'text/plain'.
+ * @param {Session} session The Solid session object
+ * @returns {Promise<void>}
+ */
+async function uploadMetadataGraph(url: string, data: string, options: {overwrite: boolean, mimeType: string}, session: Session): Promise<void> {
     try {
         if (!url.endsWith(".props")) {
             url = url.concat('.props')
@@ -497,40 +612,15 @@ async function uploadMetadataGraph(url, data, options, session: Session): Promis
     }
 }
 
-// async function deleteContainer(url, session): Promise<void> {
-//     try {
-//         const {containers, resources} = await getContainerContent(url, session)
-//         if (containers.length === 1) {
-//             // check if permissions are present
-//             for (const res of resources) {
-//                 // at this point - always true (placeholder)
-//                 if (!hasPermission(res, "http://www.w3.org/ns/auth/acl#Write")) {
-//                     throw Error(`No permission to delete resources ${res}`)
-//                 }
-//             }
-//             // check if permissions are present
-//             for (const res of resources) {
-//                 await deleteResource(res, session)
-//             }
-
-//             await deleteResource(containers[0], session)
-//             return
-//         } else {
-//             for (const container of containers) {
-//                 await deleteContainer(container, session)
-//             }
-//         }
-//     } catch (error) {
-//         error.message = `Could not delete graph ${url} - ${error.message}`
-//         throw error
-//     }
-// }
-
-// deleteContainer("http://localhost:3000/lbd/", null)
-
 ///////////////////////////// QUERY FUNCTIONS //////////////////////////////
-
-async function query(query: string, graphs: string[], session: Session): Promise<any> {
+/**
+ * Query (SPARQL SELECT) a (set of) resource(s) with Comunica. As for now, only openly accessible graphs (i.e. Read permissions) can be queried
+ * @param {string} query The SPARQL query string
+ * @param {string[]} graphs The resources to be queried as an Array
+ * @param {Session} session The Solid session object
+ * @returns {Promise<IQueryResult[]>}
+ */
+async function query(query: string, graphs: string[], session: Session): Promise<IQueryResult[]> {
     try {
         // const myEngine = newEngine();
 
@@ -552,7 +642,13 @@ async function query(query: string, graphs: string[], session: Session): Promise
     }
 }
 
-async function getPermissions(url: string, session: Session): Promise<PermissionType[]> {
+/**
+ * Get the permissions for a specific resource. Placeholder until implemented (depends on authenticated or not). Only for UI purposes.
+ * @param {string} url The url 
+ * @param {Session} session The Solid session object
+ * @returns {Promise<PermissionType[]>}
+ */
+async function getPermissions(uri: string, session: Session): Promise<PermissionType[]> {
     try {
         // until we have proper functionality for getting my access rights (dev mode)
         let permissions
@@ -563,7 +659,7 @@ async function getPermissions(url: string, session: Session): Promise<Permission
         }
         return permissions
     } catch (error) {
-        error.message = `Unable to get permissions for resource ${url} - ${error.message}`
+        error.message = `Unable to get permissions for resource ${uri} - ${error.message}`
         throw error
     }
 }
@@ -572,17 +668,19 @@ async function getPermissions(url: string, session: Session): Promise<Permission
 
 /**
  * Get the location where LBD projects are stored. At this point, standard './lbd/' will be returned. Later phases may include more complex mechanisms such as Shape Tree discovery or Index Types. Authenticated sessions may thus be required in the future.
- * @param webId 
+ * @param {string} webId The web id to find the LBD location for.
+ * @param {Session} session The Solid session object
+ * @returns {Promise<string>}
  */
-async function getLbdLocation(webId): Promise<string> {
+async function getLbdLocation(webId: string, session: Session): Promise<string> {
     let lbdLocation: string
-    // const url = new URL(session.info.webId)
-    // lbdLocation: string = `${url.origin}/lbd/`
+    // const uri = new uri(session.info.webId)
+    // lbdLocation: string = `${uri.origin}/lbd/`
 
     // until CSS is a provider
     lbdLocation = 'http://localhost:3000/lbd/'
 
-    const exists = await checkExistence(lbdLocation)
+    const exists = await checkExistence(lbdLocation, session)
     if (exists) {
         return lbdLocation
     } else {
@@ -590,19 +688,25 @@ async function getLbdLocation(webId): Promise<string> {
     }
 }
 
-async function checkExistence(graph): Promise<boolean> {
+/**
+ * Check the existence of a resource (HEAD request to the given URL)
+ * @param {string} url The url of the resource
+ * @param {Session} session The Solid session object 
+ * @returns {Promise<boolean>}
+ */
+async function checkExistence(url: string, session: Session): Promise<boolean> {
     try {
         const requestOptions = {
             method: 'HEAD'
         };
-        const response = await fetch(graph, requestOptions)
+        const response = await session.fetch(url, requestOptions)
         if (response.status === 200) {
             return true
         } else {
             return false
         }
     } catch (error) {
-        error.message = `Could not check existence of graph ${graph} - ${error.message}`
+        error.message = `Could not check existence of graph ${url} - ${error.message}`
         throw error
     }
 }

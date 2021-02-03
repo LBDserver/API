@@ -1,6 +1,10 @@
+import { PermissionType } from './consolidInterface';
 interface ICreateProject {
-    title: string;
-    description: string;
+    id: string;
+    permissions: PermissionType[];
+    uri: string;
+    graphs: IResourceObject;
+    documents: IResourceObject;
 }
 interface ICreateProjectWithMetadata {
     metadata: IResourceObject;
@@ -12,34 +16,34 @@ interface IReturnProject {
     graphs: IResourceObject;
     documents: IResourceObject;
     permissions: string[];
-    results?: IQueryResults;
+    results?: IQueryResult[];
 }
-interface IQueryResults {
-    head: {
-        vars: string[];
-    };
-    results: {
-        bindings: {
-            [variable: string]: {
-                type: string;
-                value: string;
-            }[];
-        };
+interface IQueryResult {
+    [x: string]: {
+        value: string;
+        type: string;
     };
 }
 interface IResourceObject {
-    [x: string]: string;
+    [x: string]: IReturnMetadata;
+}
+interface IReturnResources {
+    graphs: {
+        [x: string]: any;
+    };
+    documents: {
+        [x: string]: any;
+    };
 }
 interface IReturnMetadata {
-    uri: string;
     metadata: string;
-    permissions: string[];
+    permissions: PermissionType[];
 }
 interface IReturnGraph {
     uri: string;
     permissions?: string[];
     data?: IResourceObject;
-    results?: IQueryResults;
+    results?: IQueryResult[];
     metadata?: string;
 }
-export { ICreateProject, IReturnProject, IReturnMetadata, IReturnGraph, IQueryResults, ICreateProjectWithMetadata };
+export { ICreateProject, IReturnProject, IReturnMetadata, IReturnGraph, IQueryResult, ICreateProjectWithMetadata, IReturnResources };
