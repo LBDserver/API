@@ -7,7 +7,7 @@ Documentation for the LBDserver project. Includes shared interfaces as well as f
 Install the package with NPM:
 
 ```bash
-$ npm install lbd-server
+$ npm install lbd-solid
 ```
 ## Functions
 
