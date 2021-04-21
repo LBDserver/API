@@ -17,6 +17,7 @@ function validateTTL(data) {
     })
 }
 
+
 async function queryRawTTL(data, query) {
     try {
         // validate data
@@ -45,5 +46,6 @@ async function hasPermission(url: string, permission: PermissionType, ) {
 export {
     validateTTL,
     queryRawTTL,
-    hasPermission
+    hasPermission,
+    removeLastDirectoryPartOf
 }

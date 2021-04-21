@@ -30,7 +30,7 @@ async function aclTemplate(stakeholders) {
 }
 async function stakeholderTemplate(stakeholders) {
     try {
-        let graph = `@prefix  lbd:  <http://lbdserver.org/vocabulary/> .`;
+        let graph = `@prefix  lbd:  <http://lbdserver.org/vocabulary#> .`;
         stakeholders.forEach(st => {
             if (st.roles) {
                 let roles = 'lbd:Stakeholder, ';

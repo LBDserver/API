@@ -1,12 +1,13 @@
-import { v4 } from 'uuid';
-import { validateTTL, hasPermission } from '../helperfunctions';
-import { aclTemplate, stakeholderTemplate } from '../templates';
-import { Session } from '@inrupt/solid-client-authn-browser';
-import mime from 'mime-types';
-import { query as queryJS } from '../helperfunctions/query';
-const newEngine = require('@comunica/actor-init-sparql').newEngine;
-const URL = (typeof window !== 'undefined' && window.URL)
-    ? window.URL : require('url').URL;
+import { v4 } from "uuid";
+import { validateTTL, hasPermission } from "../helperfunctions";
+import { aclTemplate, stakeholderTemplate } from "../templates";
+import { Session } from "@inrupt/solid-client-authn-browser";
+import mime from "mime-types";
+import { query as queryJS, update as updateJS } from "../helperfunctions/query";
+const newEngine = require("@comunica/actor-init-sparql").newEngine;
+const N3 = require("n3");
+const URL =
+  typeof window !== "undefined" && window.URL ? window.URL : require("url").URL;
 /////////////////////// USER FUNCTIONS //////////////////////////
 /**
  * Log in using OIDC and a Solid Session.
@@ -16,17 +17,19 @@ const URL = (typeof window !== 'undefined' && window.URL)
  * @returns {Promise<Session>} Returns a Solid Session object
  */
 async function login(oidcIssuer, redirectUrl, session) {
-    try {
-        await session.login({
-            oidcIssuer,
-            redirectUrl
-        });
-        return session;
+  try {
+    if (!session) {
+      session = new Session()
     }
-    catch (error) {
-        error.message = `Unable to login - ${error.message}`;
-        throw error;
-    }
+    await session.login({
+      oidcIssuer,
+      redirectUrl,
+    });
+    return session;
+  } catch (error) {
+    error.message = `Unable to login - ${error.message}`;
+    throw error;
+  }
 }
 /////////////////////// USER FUNCTIONS //////////////////////////
 /**
@@ -37,13 +40,12 @@ async function login(oidcIssuer, redirectUrl, session) {
  * @returns {Promise<Session>} Returns a Solid Session object
  */
 async function register(oidcIssuer, redirecturi, session) {
-    try {
-        throw new Error(`not implemented in Solid LBD server environment`);
-    }
-    catch (error) {
-        error.message = `Unable to register - ${error.message}`;
-        throw error;
-    }
+  try {
+    throw new Error(`not implemented in Solid LBD server environment`);
+  } catch (error) {
+    error.message = `Unable to register - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Helper function to process the session after OIDC login. Retrieves the "code" from the current uri.
@@ -51,18 +53,17 @@ async function register(oidcIssuer, redirecturi, session) {
  * @returns {Promise<Session>} Returns a Solid Session object
  */
 async function processSession(session) {
-    try {
-        const authCode = new URL(window.location.href).searchParams.get("code");
-        if (authCode) {
-            console.log("Being redirected from the IdP");
-            await session.handleIncomingRedirect(window.location.href);
-        }
-        return session;
+  try {
+    const authCode = new URL(window.location.href).searchParams.get("code");
+    if (authCode) {
+      console.log("Being redirected from the IdP");
+      await session.handleIncomingRedirect(window.location.href);
     }
-    catch (error) {
-        error.message = `Unable to process session - ${error.message}`;
-        throw error;
-    }
+    return session;
+  } catch (error) {
+    error.message = `Unable to process session - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Log out from a Solid Session.
@@ -70,63 +71,96 @@ async function processSession(session) {
  * @returns {Promise<Session>} Returns a Solid Session object
  */
 async function logout(session) {
-    try {
-        await session.logout();
-        return session;
-    }
-    catch (error) {
-        error.message = `Unable to logout - ${error.message}`;
-        throw error;
-    }
+  try {
+    await session.logout();
+    return session;
+  } catch (error) {
+    error.message = `Unable to logout - ${error.message}`;
+    throw error;
+  }
 }
 /////////////////////// PROJECT FUNCTIONS ///////////////////////
 /**
  * Create a new project environment. As the project ID is created here, the project metadata graph (.props) should be created afterwards (createGraph)
  * @param {Array<IAgent>} stakeholders Array of stakeholders to be involved in the project, as well as their access rights to the project in general.
+ * @param {object} meta Metadata, containing {label, description}
  * @param {Session} session The Solid Session object.
  * @returns {Promise<ICreateProject>}
  */
-async function createProject(stakeholders, session) {
-    try {
-        // whenever CSS is an ID provider as well ...
-        // const myuri = new URL(session.info.webId)
-        // for now: 
-        const myuri = new URL('http://localhost:3000');
-        // check if a dedicated folder exists for lbd projects (if not: create one)
-        let lbdLocation = await getLbdLocation(session.info.webId, session);
-        if (!lbdLocation) {
-            lbdLocation = `${myuri.origin}/lbd/`;
-            await createContainer(lbdLocation, session);
-        }
-        const id = v4();
-        // create project acl in  project directory
-        const acl = await aclTemplate(stakeholders);
-        await uploadResource(`${lbdLocation}${id}/.acl`, acl, { mimeType: "text/turtle" }, session);
-        const stakeholderGraph = await stakeholderTemplate(stakeholders);
-        await uploadResource(`${lbdLocation}${id}/stakeholders.ttl`, stakeholderGraph, { mimeType: "text/turtle" }, session);
-        await createContainer(`${lbdLocation}${id}/files/`, session);
-        await createContainer(`${lbdLocation}${id}/graphs/`, session);
-        // invite agents and make aware of their role in the project
-        let permissions = [];
-        stakeholders.forEach(st => {
-            if (st.uri === session.info.webId) {
-                permissions = st.permissions;
-            }
-        });
-        // return project
-        const project = {
-            id,
-            permissions,
-            uri: lbdLocation + id + '/',
-            graphs: {},
-            documents: {},
-        };
-        return project;
-    }
-    catch (error) {
-        error.message = `Could not create project - ${error.message}`;
-        throw error;
-    }
+async function createProject(stakeholders, meta, session) {
+  try {
+    // whenever CSS is an ID provider as well ...
+    // const myuri = new URL(session.info.webId)
+
+    // check if a dedicated folder exists for lbd projects
+    let lbdLocation = await getLbdLocation(session.info.webId, session);
+    lbdLocation = lbdLocation.split("/");
+    lbdLocation.pop();
+    lbdLocation = lbdLocation.join("/") + "/";
+    const id = v4();
+    // create project acl in  project directory
+    const acl = await aclTemplate(stakeholders);
+    await uploadResource(
+      `${lbdLocation}${id}/.acl`,
+      acl,
+      { mimeType: "text/turtle" },
+      session
+    );
+    const stakeholderGraph = await stakeholderTemplate(stakeholders);
+    await uploadResource(
+      `${lbdLocation}${id}/stakeholders.ttl`,
+      stakeholderGraph,
+      { mimeType: "text/turtle" },
+      session
+    );
+
+    await createContainer(`${lbdLocation}${id}/files/`, session);
+    await createContainer(`${lbdLocation}${id}/graphs/`, session);
+
+    const metaTemplate = namedGraphMeta(
+      id,
+      meta,
+      `${lbdLocation}${id}/stakeholders.ttl`,
+      `${lbdLocation}${id}/graphs/`,
+      `${lbdLocation}${id}/files/`
+    );
+    await uploadMetadataGraph(
+      `${lbdLocation}${id}/.props`,
+      metaTemplate,
+      { mimeType: "text/turtle" },
+      session
+    );
+    // invite agents and make aware of their role in the project
+    let permissions = [];
+    stakeholders.forEach((st) => {
+      if (st.uri === session.info.webId) {
+        permissions = st.permissions;
+      }
+    });
+
+    await putInRegistry();
+    // return project
+    const project = {
+      id,
+      permissions,
+      uri: lbdLocation + id + "/",
+      graphs: {},
+      documents: {},
+    };
+    return project;
+  } catch (error) {
+    error.message = `Could not create project - ${error.message}`;
+    throw error;
+  }
+}
+
+async function putInRegistry(reg, uri) {
+  try {
+    console.log("not implemented");
+    return;
+  } catch (error) {
+    error.message = "error writing project to registry";
+  }
 }
 /**
  * Delete an LBD project. The project will only be deleted in your own POD, of course.
@@ -135,27 +169,29 @@ async function createProject(stakeholders, session) {
  * @returns {Promise<void>}
  */
 async function deleteProject(uri, session) {
-    try {
-        const { containers, resources } = await getContainerContent(uri, session);
-        for (const container of containers) {
-            if (container !== uri) {
-                const { containers, resources } = await getContainerContent(container, session);
-                for (const res of resources) {
-                    await deleteResource(res, session);
-                }
-                await deleteResource(container, session);
-            }
-        }
+  try {
+    const { containers, resources } = await getContainerContent(uri, session);
+    for (const container of containers) {
+      if (container !== uri) {
+        const { containers, resources } = await getContainerContent(
+          container,
+          session
+        );
         for (const res of resources) {
-            await deleteResource(res, session);
+          await deleteResource(res, session);
         }
-        await deleteResource(uri, session);
-        return;
+        await deleteResource(container, session);
+      }
     }
-    catch (error) {
-        error.message = `Could not delete project - ${error.message}`;
-        throw error;
+    for (const res of resources) {
+      await deleteResource(res, session);
     }
+    await deleteResource(uri, session);
+    return;
+  } catch (error) {
+    error.message = `Could not delete project - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Get all the LBD projects in the POD of the authenticated user.
@@ -163,23 +199,60 @@ async function deleteProject(uri, session) {
  * @returns {Promise<IReturnProject[]>}
  */
 async function getUserProjects(session) {
-    try {
-        const lbdLocation = await getLbdLocation(session.info.webId, session);
-        const { containers, resources } = await getContainerContent(lbdLocation, session);
-        const projects = [];
-        for (const container of containers) {
-            if (container !== lbdLocation) {
-                const project = await getOneProject(container, session);
-                projects.push(project);
-            }
-        }
-        return projects;
+  try {
+    const lbdLocation = await getLbdLocation(session.info.webId, session);
+    const projectMeta = await getLBDProjects(lbdLocation, session);
+    const projects = [];
+    for (const container of projectMeta) {
+      if (container !== lbdLocation) {
+        const project = await getOneProject(container, session);
+        projects.push(project);
+      }
     }
-    catch (error) {
-        error.message = `Unable to get user projects - ${error.message}`;
-        throw error;
-    }
+    return projects;
+  } catch (error) {
+    error.message = `Unable to get user projects - ${error.message}`;
+    throw error;
+  }
 }
+
+async function getLBDProjects(lbdLocation, session) {
+  try {
+    const q = `PREFIX lbd: <https://lbdserver.org/vocabulary#> Select ?p where {?r a lbd:ProjectRegistry; lbd:hasRegistration ?p}`;
+    const pr = await query(q, [lbdLocation], session);
+    const proj = pr.map((p) => {
+      return p.p.value;
+    });
+    return proj;
+  } catch (error) {
+    error.message = `Unable to get lbd projects - ${error.message}`;
+    console.log(`error`, error);
+    throw error;
+  }
+}
+
+async function getDataLocations(projLocation, session) {
+  try {
+    const q = `PREFIX lbd: <https://lbdserver.org/vocabulary#> Select ?non ?rdf ?st ?id where {?r a <https://lbdserver.org/vocabulary#PartialProject>; <https://lbdserver.org/vocabulary#hasRDFContainer> ?rdf ; <https://lbdserver.org/vocabulary#hasNonRDFContainer> ?non ; <https://lbdserver.org/vocabulary#hasStakeholderGraph> ?st ; <https://lbdserver.org/vocabulary#hasProjectId> ?id .}`;
+    const pr = await query(q, [projLocation], session);
+    let folder = projLocation.split("/");
+    folder.pop();
+    folder = folder.join("/") + "/";
+
+    const details = {
+      rdf: pr[0].rdf.value,
+      nonRdf: pr[0].non.value,
+      st: pr[0].st.value,
+      loc: folder,
+      id: pr[0].id.value
+    };
+    return details;
+  } catch (error) {
+    error.message = `Unable to get data locations - ${error.message}`;
+    throw error;
+  }
+}
+
 /**
  * Get a single project by its uri. From your local project, other stakeholders are determined and the federated project data you have access to is fetched.
  * @param {string} uri The uri of the project.
@@ -187,57 +260,75 @@ async function getUserProjects(session) {
  * @returns {Promise<IReturnProject>}
  */
 async function getOneProject(uri, session) {
-    try {
-        // get the information the authenticated agent himself has about the project (e.g. to fetch the other stakeholders)
-        const project = await getLocalProject(uri, session);
-        // fetch stakeholder list locally
-        const stakeholderList = await query("PREFIX lbd: <http://lbdserver.org/vocabulary/> SELECT ?st WHERE {?st a lbd:Stakeholder}", [`${uri}stakeholders.ttl`], session);
-        for (const st of stakeholderList) {
-            const webId = st["st"].value;
-            if (webId !== session.info.webId) {
-                try {
-                    const projectLocation = await getLbdLocation(webId, session);
-                    const { graphs, documents } = await getLocalProject(`${projectLocation}${project.id}/`, session);
-                    project.graphs = { ...project.graphs, ...graphs };
-                    project.documents = { ...project.documents, ...documents };
-                }
-                catch (error) {
-                    error.message = `Could not retrieve project data from ${webId} - ${error.message}`;
+  try {
+    // get the information the authenticated agent himself has about the project (e.g. to fetch the other stakeholders)
+    const details = await getDataLocations(uri, session);
+    const project = await getLocalProject(uri, details, session, session.info.webId);
+    const stakeholderList = await query("PREFIX lbd: <http://lbdserver.org/vocabulary#> SELECT ?st WHERE {?st a lbd:Stakeholder}", [details.st], session);
+    console.log(`stakeholderList`, stakeholderList)
+    for (const st of stakeholderList) {
+        const webId = st["st"].value;
+        console.log(`session.info.webId`, session.info.webId)
+        if (webId != session.info.webId) {
+            try {
+                console.log(`webId`, webId)
+                let  projectLocation = await getLbdLocation(webId, session);
+                console.log(`projectLocation`, projectLocation)
+                // check if project in registry/lbdlocation
+                const projects = await getLBDProjects(projectLocation, session)
+                for (const pro of projects) {
+                    if (pro.split("/").includes(details.id)) {
+                        const newDetails = await getDataLocations(pro, session)
+                        console.log(`newDetails`, newDetails)
+                        const { graphs, documents } = await getLocalProject(`${projectLocation}${project.id}/`, newDetails, session, webId);
+                        project.graphs = { ...project.graphs, ...graphs };
+                        project.documents = { ...project.documents, ...documents };
+                    }
                 }
             }
+            catch (error) {
+                error.message = `Could not retrieve project data from ${webId} - ${error.message}`;
+            }
         }
-        return project;
     }
-    catch (error) {
-        error.message = `Unable to get project with uri ${uri} - ${error.message}`;
-        throw error;
-    }
+    return project;
+  } catch (error) {
+    error.message = `Unable to get project with uri ${uri} - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Get only the project data residing in your POD.
  * @param {string} uri The uri of the project.
+ * @param {object} details The main details as an object(rdf, nonRdf, st)
  * @param {Session} session The Solid Session object.
  * @returns {Promise<IReturnProject>}
  */
-async function getLocalProject(uri, session) {
-    try {
-        const id = uri.split('/')[uri.split('/').length - 2];
-        const { graphs, documents } = await getProjectResources(uri, session);
-        const { metadata, permissions } = await getResourceMetadata(uri, session);
-        const project = {
-            id,
-            uri,
-            metadata,
-            permissions,
-            graphs,
-            documents
-        };
-        return project;
-    }
-    catch (error) {
-        error.message = `Unable to get local project with uri ${uri} - ${error.message}`;
-        throw error;
-    }
+async function getLocalProject(uri, details, session, owner) {
+  try {
+    const id = uri.split("/")[uri.split("/").length - 2];
+
+    let folderUri = uri.split("/")
+    folderUri.pop()
+    folderUri = folderUri.join('/') + "/"
+    const { graphs, documents } = await getProjectResources(details, session, owner);
+    const { metadata, permissions } = await getResourceMetadata(
+      details.loc,
+      session
+    );
+    const project = {
+      id,
+      uri: folderUri,
+      metadata,
+      permissions,
+      graphs,
+      documents,
+    };
+    return project;
+  } catch (error) {
+    error.message = `Unable to get local project with uri ${uri} - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Gets only the graphs and documents, without other project info (i.e. their metadata & permissions)
@@ -245,66 +336,69 @@ async function getLocalProject(uri, session) {
  * @param {Session} session The Solid Session object.
  * @returns {Promise<IReturnResources>}
  */
-async function getProjectResources(uri, session) {
-    try {
-        const id = uri.split('/')[uri.split('/').length - 2];
-        const { resources: fileList } = await getContainerContent(`${uri}files/`, session);
-        const { resources: graphList } = await getContainerContent(`${uri}graphs/`, session);
-        const graphs = {};
-        for (const graph of graphList) {
-            try {
-                if (!graph.endsWith('.props')) {
-                    graphs[graph] = await getResourceMetadata(graph, session);
-                }
-            }
-            catch (error) {
-                console.log(error);
-            }
+async function getProjectResources(details, session, owner) {
+  try {
+    const { resources: fileList } = await getContainerContent(
+      details.nonRdf,
+      session
+    );
+    const { resources: graphList } = await getContainerContent(
+      details.rdf,
+      session
+    );
+    const graphs = {};
+    for (const graph of graphList) {
+      try {
+        if (!graph.endsWith(".props")) {
+          graphs[graph] = await getResourceMetadata(graph, session);
+          graphs[graph]["owner"] = owner
         }
-        const documents = {};
-        for (const file of fileList) {
-            try {
-                if (!file.endsWith('.props')) {
-                    documents[file] = await getResourceMetadata(file, session);
-                }
-            }
-            catch (error) {
-                console.log(error);
-            }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    const documents = {};
+    for (const file of fileList) {
+      try {
+        if (!file.endsWith(".props")) {
+          documents[file] = await getResourceMetadata(file, session);
+          documents[file]["owner"] = owner
         }
-        const projectResources = {
-            graphs,
-            documents
-        };
-        return projectResources;
+      } catch (error) {
+        console.log(error);
+      }
     }
-    catch (error) {
-        error.message = `Unable to get local project with uri ${uri} - ${error.message}`;
-        throw error;
-    }
+    const projectResources = {
+      graphs,
+      documents,
+    };
+    return projectResources;
+  } catch (error) {
+    error.message = `Unable to get local project - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Get the open projects on a specific LBDlocation.
  * @param {string} lbdLocation The LBD project location to search for open projects
  * @returns {Promise<IReturnProject[]>}
  */
-async function getOpenProjects(lbdLocation) {
-    try {
-        const session = new Session();
-        const { containers } = await getContainerContent(lbdLocation, session);
-        const projects = [];
-        for (const container of containers) {
-            if (container !== lbdLocation) {
-                const project = await getOneProject(container, session);
-                projects.push(project);
-            }
-        }
-        return projects;
+async function getOpenProjects(registry) {
+  try {
+    const session = new Session();
+    const containers = await getLBDProjects(registry, session);
+    const projects = [];
+    for (const container of containers) {
+      if (container !== registry) {
+        const project = await getOneProject(container, session);
+        projects.push(project);
+      }
     }
-    catch (error) {
-        error.message = `Could not get open projects at LBDlocation ${lbdLocation} - ${error.message}`;
-        throw error;
-    }
+    return projects;
+  } catch (error) {
+    error.message = `Could not get open projects at LBDlocation ${registry} - ${error.message}`;
+    throw error;
+  }
 }
 /////////////////////// RESOURCE FUNCTIONS //////////////////////
 /**
@@ -318,41 +412,39 @@ async function getOpenProjects(lbdLocation) {
  * @returns {Promise<void>}
  */
 async function uploadResource(url, data, options, session) {
-    try {
-        if (!options.overwrite) {
-            // check if graph does not exist yet  
-            const exists = await checkExistence(url, session);
-            if (exists) {
-                throw new Error("Resource already exists");
-            }
-        }
-        //content-type is guessed by uri (default: text/plain)
-        let mimeType;
-        if (!options.mimeType) {
-            mimeType = mime.lookup(url);
-            if (mimeType === false) {
-                // set default mimetype
-                mimeType = "text/plain";
-            }
-        }
-        else {
-            mimeType = options.mimeType;
-        }
-        var requestOptions = {
-            method: 'PUT',
-            headers: {
-                "Content-Type": mimeType
-            },
-            body: data,
-            redirect: 'follow'
-        };
-        await session.fetch(url, requestOptions);
-        return;
+  try {
+    if (!options.overwrite) {
+      // check if graph does not exist yet
+      const exists = await checkExistence(url, session);
+      if (exists) {
+        throw new Error("Resource already exists");
+      }
     }
-    catch (error) {
-        error.message = `Unable to upload resource - ${error.message}`;
-        throw error;
+    //content-type is guessed by uri (default: text/plain)
+    let mimeType;
+    if (!options.mimeType) {
+      mimeType = mime.lookup(url);
+      if (mimeType === false) {
+        // set default mimetype
+        mimeType = "text/plain";
+      }
+    } else {
+      mimeType = options.mimeType;
     }
+    var requestOptions = {
+      method: "PUT",
+      headers: {
+        "Content-Type": mimeType,
+      },
+      body: data,
+      redirect: "follow",
+    };
+    await session.fetch(url, requestOptions);
+    return;
+  } catch (error) {
+    error.message = `Unable to upload resource - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Get a resource actual data.
@@ -361,35 +453,34 @@ async function uploadResource(url, data, options, session) {
  * @returns {Promise<any>}
  */
 async function getResource(uri, session) {
-    try {
-        const resource = await session.fetch(uri);
-        return resource;
-    }
-    catch (error) {
-        error.message = `Unable to fetch resource with uri ${uri} - ${error.message}`;
-        throw error;
-    }
+  try {
+    const resource = await session.fetch(uri);
+    return resource;
+  } catch (error) {
+    error.message = `Unable to fetch resource with uri ${uri} - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Get a resource's metadata
- * @param {string} uri The uri of the project.
+ * @param {string} details The project details as object {st, rdf, nonRdf}
  * @param {Session} session The Solid Session object.
  * @returns {Promise<IReturnMetadata>}
  */
 async function getResourceMetadata(uri, session) {
-    try {
-        const permissions = await getPermissions(uri, session);
-        if (!permissions.includes("http://www.w3.org/ns/auth/acl#Read")) {
-            throw new Error(`No acl:Read rights for resource with uri ${uri}`);
-        }
-        const metadataRaw = await session.fetch(`${uri}.props`);
-        const metadata = await metadataRaw.text();
-        return { metadata, permissions };
+  try {
+    const permissions = await getPermissions(uri, session);
+    if (!permissions.includes("http://www.w3.org/ns/auth/acl#Read")) {
+      throw new Error(`No acl:Read rights for resource with uri ${uri}`);
     }
-    catch (error) {
-        error.message = `Unable to fetch resource with uri ${uri} - ${error.message}`;
-        throw error;
-    }
+
+    const metadataRaw = await session.fetch(`${uri}.props`);
+    const metadata = await metadataRaw.text();
+    return { metadata, permissions };
+  } catch (error) {
+    error.message = `Unable to fetch resource with - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Upload a graph (TTL) to your POD.
@@ -403,16 +494,28 @@ async function getResourceMetadata(uri, session) {
  * @returns {Promise<IReturnMetadata>}
  */
 async function uploadGraph(url, data, metadata, options, session) {
-    try {
-        await validateTTL(metadata);
-        await uploadResource(url, data, options, session);
-        await uploadResource(url + '.props', metadata, { ...options, mimeType: "text/turtle" }, session);
-        return { metadata, permissions: ["http://www.w3.org/ns/auth/acl#Read", "http://www.w3.org/ns/auth/acl#Write", "http://www.w3.org/ns/auth/acl#Append", "http://www.w3.org/ns/auth/acl#Control"] };
-    }
-    catch (error) {
-        error.message = `Could not create graph - ${error.message}`;
-        throw error;
-    }
+  try {
+    await validateTTL(metadata);
+    await uploadResource(url, data, options, session);
+    await uploadResource(
+      url + ".props",
+      metadata,
+      { ...options, mimeType: "text/turtle" },
+      session
+    );
+    return {
+      metadata,
+      permissions: [
+        "http://www.w3.org/ns/auth/acl#Read",
+        "http://www.w3.org/ns/auth/acl#Write",
+        "http://www.w3.org/ns/auth/acl#Append",
+        "http://www.w3.org/ns/auth/acl#Control",
+      ],
+    };
+  } catch (error) {
+    error.message = `Could not create graph - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Upload a non-RDF resource to your POD.
@@ -426,16 +529,28 @@ async function uploadGraph(url, data, metadata, options, session) {
  * @returns {Promise<IReturnMetadata>}
  */
 async function uploadDocument(url, data, metadata, options, session) {
-    try {
-        await validateTTL(metadata);
-        await uploadResource(url, data, options, session);
-        await uploadResource(url + '.props', metadata, { ...options, mimeType: "text/turtle" }, session);
-        return { metadata, permissions: ["http://www.w3.org/ns/auth/acl#Read", "http://www.w3.org/ns/auth/acl#Write", "http://www.w3.org/ns/auth/acl#Append", "http://www.w3.org/ns/auth/acl#Control"] };
-    }
-    catch (error) {
-        error.message = `Could not upload document - ${error.message}`;
-        throw error;
-    }
+  try {
+    await validateTTL(metadata);
+    await uploadResource(url, data, options, session);
+    await uploadResource(
+      url + ".props",
+      metadata,
+      { ...options, mimeType: "text/turtle" },
+      session
+    );
+    return {
+      metadata,
+      permissions: [
+        "http://www.w3.org/ns/auth/acl#Read",
+        "http://www.w3.org/ns/auth/acl#Write",
+        "http://www.w3.org/ns/auth/acl#Append",
+        "http://www.w3.org/ns/auth/acl#Control",
+      ],
+    };
+  } catch (error) {
+    error.message = `Could not upload document - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Delete a resource
@@ -444,17 +559,16 @@ async function uploadDocument(url, data, metadata, options, session) {
  * @returns {Promise<void>}
  */
 async function deleteResource(url, session) {
-    try {
-        var requestOptions = {
-            method: 'DELETE',
-            redirect: 'follow'
-        };
-        await session.fetch(url, requestOptions);
-    }
-    catch (error) {
-        error.message = `Could not delete resource ${url} - ${error.message}`;
-        throw error;
-    }
+  try {
+    var requestOptions = {
+      method: "DELETE",
+      redirect: "follow",
+    };
+    await session.fetch(url, requestOptions);
+  } catch (error) {
+    error.message = `Could not delete resource ${url} - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Delete an RDF resource and its metadata
@@ -463,8 +577,8 @@ async function deleteResource(url, session) {
  * @returns {Promise<void>}
  */
 async function deleteGraph(url, session) {
-    await deleteResource(url, session);
-    await deleteResource(url + '.props', session);
+  await deleteResource(url, session);
+  await deleteResource(url + ".props", session);
 }
 /**
  * Delete an non-RDF resource and its metadata
@@ -473,8 +587,8 @@ async function deleteGraph(url, session) {
  * @returns {Promise<void>}
  */
 async function deleteDocument(url, session) {
-    await deleteResource(url, session);
-    await deleteResource(url + '.props', session);
+  await deleteResource(url, session);
+  await deleteResource(url + ".props", session);
 }
 /**
  * Create a container with a given url
@@ -483,24 +597,23 @@ async function deleteDocument(url, session) {
  * @returns {Promise<void>}
  */
 async function createContainer(url, session) {
-    try {
-        if (!url.endsWith("/")) {
-            url = url.concat('/');
-        }
-        const requestOptions = {
-            method: 'PUT',
-            headers: {
-                "Content-Type": "text/turtle"
-            },
-            redirect: 'follow'
-        };
-        await session.fetch(url, requestOptions);
-        return;
+  try {
+    if (!url.endsWith("/")) {
+      url = url.concat("/");
     }
-    catch (error) {
-        error.message = `Unable to create container - ${error.message}`;
-        throw error;
-    }
+    const requestOptions = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "text/turtle",
+      },
+      redirect: "follow",
+    };
+    await session.fetch(url, requestOptions);
+    return;
+  } catch (error) {
+    error.message = `Unable to create container - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Get the content of the container as an object with a list of resources and subcontainers.
@@ -509,33 +622,43 @@ async function createContainer(url, session) {
  * @returns {Promise<{containers: string[], resources: string[]}>}
  */
 async function getContainerContent(url, session) {
-    try {
-        // fetch all resources in the container
-        const containers = [];
-        const q1 = await query("prefix ldp: <http://www.w3.org/ns/ldp#> Select * where {?s a ldp:Container}", [url], session);
-        q1.forEach(container => {
-            const value = container['s'].value;
-            containers.push(value);
-        });
-        if (!containers.includes(url)) {
-            throw new Error(`${url} is not recognised as a container.`);
-        }
-        const resources = [];
-        const q2 = await query("prefix ldp: <http://www.w3.org/ns/ldp#> Select * where {?s a ldp:Resource . FILTER NOT EXISTS {?s a ldp:Container}}", [url], session);
-        q2.forEach(res => {
-            const value = res.s.value;
-            // at this point - always true (placeholder)
-            if (!hasPermission(value, "http://www.w3.org/ns/auth/acl#Write")) {
-                throw Error(`No permission to delete this container`);
-            }
-            resources.push(value);
-        });
-        return { containers, resources };
+  try {
+    // fetch all resources in the container
+    const containers = [];
+    if (!url.endsWith("/")) {
+      url += "/";
     }
-    catch (error) {
-        error.message = `Error fetching container content - ${error.message}`;
-        throw error;
+    const q1 = await query(
+      "prefix ldp: <http://www.w3.org/ns/ldp#> Select * where {?s a ldp:Container}",
+      [url],
+      session
+    );
+    q1.forEach((container) => {
+      const value = container["s"].value;
+      containers.push(value);
+    });
+    if (!containers.includes(url)) {
+      throw new Error(`${url} is not recognised as a container.`);
     }
+    const resources = [];
+    const q2 = await query(
+      "prefix ldp: <http://www.w3.org/ns/ldp#> Select * where {?s a ldp:Resource . FILTER NOT EXISTS {?s a ldp:Container}}",
+      [url],
+      session
+    );
+    q2.forEach((res) => {
+      const value = res.s.value;
+      // at this point - always true (placeholder)
+      if (!hasPermission(value, "http://www.w3.org/ns/auth/acl#Write")) {
+        throw Error(`No permission to delete this container`);
+      }
+      resources.push(value);
+    });
+    return { containers, resources };
+  } catch (error) {
+    error.message = `Error fetching container content - ${error.message}`;
+    throw error;
+  }
 }
 /**
  * Upload the metadata graph for a given resource. Metadata graph urls will end with ".props".
@@ -548,18 +671,17 @@ async function getContainerContent(url, session) {
  * @returns {Promise<void>}
  */
 async function uploadMetadataGraph(url, data, options, session) {
-    try {
-        if (!url.endsWith(".props")) {
-            url = url.concat('.props');
-        }
-        await validateTTL(data);
-        const response = await uploadResource(url, data, options, session);
-        return response;
+  try {
+    if (!url.endsWith(".props")) {
+      url = url.concat(".props");
     }
-    catch (error) {
-        error.message = `Could not create metadata graph - ${error.message}`;
-        throw error;
-    }
+    await validateTTL(data);
+    const response = await uploadResource(url, data, options, session);
+    return response;
+  } catch (error) {
+    error.message = `Could not create metadata graph - ${error.message}`;
+    throw error;
+  }
 }
 ///////////////////////////// QUERY FUNCTIONS //////////////////////////////
 /**
@@ -570,22 +692,52 @@ async function uploadMetadataGraph(url, data, options, session) {
  * @returns {Promise<IQueryResult[]>}
  */
 async function query(query, graphs, session) {
-    try {
-        // const myEngine = newEngine();
-        // const result = await myEngine.query(query, { sources: graphs, fetch: session.fetch });
-        // let bindings: Array<Map<string, any>> = await result.bindings();
-        // myEngine.invalidateHttpCache()
-        // const client = new QueryEngineComunicaSolid({sources: graphs})
-        // const res = await client.query({query, type: "distinct"})
-        // console.log('res', res)
-        const bindings = await queryJS(query, graphs, session);
-        return bindings;
-    }
-    catch (error) {
-        error.message = `Could not query resource - ${error.message}`;
-        throw error;
-    }
+  try {
+    // const myEngine = newEngine();
+    // const result = await myEngine.query(query, { sources: graphs, fetch: session.fetch });
+    // let bindings: Array<Map<string, any>> = await result.bindings();
+    // myEngine.invalidateHttpCache()
+    // const client = new QueryEngineComunicaSolid({sources: graphs})
+    // const res = await client.query({query, type: "distinct"})
+    // console.log('res', res)
+    const bindings = await queryJS(query, graphs, session);
+    return bindings;
+  } catch (error) {
+    error.message = `Could not query resource - ${error.message}`;
+    throw error;
+  }
 }
+
+/**
+ * Query (SPARQL SELECT) a (set of) resource(s) with Comunica. As for now, only openly accessible graphs (i.e. Read permissions) can be queried
+ * @param {string} query The SPARQL query string
+ * @param {string[]} graphs The resources to be queried as an Array
+ * @param {Session} session The Solid session object
+ * @returns {Promise<IQueryResult[]>}
+ */
+async function update(query, graph, session) {
+  try {
+    const doc = await getResource(graph, session);
+    const text = await doc.text();
+ // not implemented!
+    return;
+  } catch (error) {
+    console.log(`error`, error);
+    throw error;
+  }
+}
+
+function parseTriples(data) {
+  const { DataFactory } = N3;
+  const parser = new N3.parser();
+  return new Promise((resolve, reject) => {
+    parser.parse(data, (error, quad, prefixes) => {
+      if (quad) console.log(quad);
+      else console.log("# That's all, folks!", prefixes);
+    });
+  });
+}
+
 /**
  * Get the permissions for a specific resource. Placeholder until implemented (depends on authenticated or not). Only for UI purposes.
  * @param {string} url The url
@@ -593,21 +745,24 @@ async function query(query, graphs, session) {
  * @returns {Promise<PermissionType[]>}
  */
 async function getPermissions(uri, session) {
-    try {
-        // until we have proper functionality for getting my access rights (dev mode)
-        let permissions;
-        if (session.info.webId) {
-            permissions = ["http://www.w3.org/ns/auth/acl#Read", "http://www.w3.org/ns/auth/acl#Write", "http://www.w3.org/ns/auth/acl#Append", "http://www.w3.org/ns/auth/acl#Control"];
-        }
-        else {
-            permissions = ["http://www.w3.org/ns/auth/acl#Read"];
-        }
-        return permissions;
+  try {
+    // until we have proper functionality for getting my access rights (dev mode)
+    let permissions;
+    if (session.info.webId) {
+      permissions = [
+        "http://www.w3.org/ns/auth/acl#Read",
+        "http://www.w3.org/ns/auth/acl#Write",
+        "http://www.w3.org/ns/auth/acl#Append",
+        "http://www.w3.org/ns/auth/acl#Control",
+      ];
+    } else {
+      permissions = ["http://www.w3.org/ns/auth/acl#Read"];
     }
-    catch (error) {
-        error.message = `Unable to get permissions for resource ${uri} - ${error.message}`;
-        throw error;
-    }
+    return permissions;
+  } catch (error) {
+    error.message = `Unable to get permissions for resource ${uri} - ${error.message}`;
+    throw error;
+  }
 }
 ///////////////////////////// HELPER FUNCTIONS //////////////////////////////////
 /**
@@ -617,18 +772,22 @@ async function getPermissions(uri, session) {
  * @returns {Promise<string>}
  */
 async function getLbdLocation(webId, session) {
-    let lbdLocation;
-    // const uri = new uri(session.info.webId)
-    // lbdLocation: string = `${uri.origin}/lbd/`
-    // until CSS is a provider
-    lbdLocation = 'http://localhost:3000/lbd/';
-    const exists = await checkExistence(lbdLocation, session);
-    if (exists) {
-        return lbdLocation;
-    }
-    else {
-        return null;
-    }
+  let lbdLocation;
+  // const uri = new uri(session.info.webId)
+  // lbdLocation: string = `${uri.origin}/lbd/`
+  // until CSS is a provider
+
+  const q = `SELECT ?loc WHERE {?me <https://lbdserver.org/vocabulary#hasProjectRegistry> ?loc}`;
+  const loc = await query(q, [webId], session);
+
+  lbdLocation = loc[0].loc.value;
+
+  const exists = await checkExistence(lbdLocation, session);
+  if (exists) {
+    return lbdLocation;
+  } else {
+    return null;
+  }
 }
 /**
  * Check the existence of a resource (HEAD request to the given URL)
@@ -637,21 +796,62 @@ async function getLbdLocation(webId, session) {
  * @returns {Promise<boolean>}
  */
 async function checkExistence(url, session) {
-    try {
-        const requestOptions = {
-            method: 'HEAD'
-        };
-        const response = await session.fetch(url, requestOptions);
-        if (response.status === 200) {
-            return true;
-        }
-        else {
-            return false;
-        }
+  try {
+    const requestOptions = {
+      method: "HEAD",
+    };
+    const response = await session.fetch(url, requestOptions);
+    if (response.status === 200) {
+      return true;
+    } else {
+      return false;
     }
-    catch (error) {
-        error.message = `Could not check existence of graph ${url} - ${error.message}`;
-        throw error;
-    }
+  } catch (error) {
+    error.message = `Could not check existence of graph ${url} - ${error.message}`;
+    throw error;
+  }
 }
-export { login, processSession, logout, register, createProject, deleteProject, getUserProjects, getOneProject, getOpenProjects, uploadResource, uploadGraph, uploadDocument, deleteResource, deleteGraph, deleteDocument, createContainer, getContainerContent, uploadMetadataGraph, getLbdLocation, query };
+
+const namedGraphMeta = (id, meta, stakeholders, graphs, files) => {
+  let data = `@prefix acl: <http://www.w3.org/ns/auth/acl#>.    
+    @prefix lbd: <https://lbdserver.org/vocabulary#>.     
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.    
+    @prefix : <#> .     
+    @prefix proj: <./> .
+     
+:this a lbd:PartialProject;
+     lbd:hasProjectId "${id}" ;
+     lbd:hasStakeholderGraph <${stakeholders}> ;
+     lbd:hasRDFContainer <${graphs}>;
+     lbd:hasNonRDFContainer <${files}> ;
+     rdfs:comment "${meta.description}";        
+     rdfs:label "${meta.label}" .    
+    `;
+
+  data = data.replace(/\n/g, "");
+  return data;
+};
+
+export {
+  login,
+  processSession,
+  logout,
+  register,
+  createProject,
+  deleteProject,
+  getUserProjects,
+  getOneProject,
+  getOpenProjects,
+  uploadResource,
+  uploadGraph,
+  uploadDocument,
+  deleteResource,
+  deleteGraph,
+  deleteDocument,
+  createContainer,
+  getContainerContent,
+  uploadMetadataGraph,
+  getLbdLocation,
+  query,
+  update,
+};

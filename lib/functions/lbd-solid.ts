@@ -671,7 +671,8 @@ async function getLbdLocation(webId: string, session: Session): Promise<string> 
     let lbdLocation: string
     // const uri = new uri(session.info.webId)
     // lbdLocation: string = `${uri.origin}/lbd/`
-
+    const q = `SELECT ?loc WHERE {?me lbd:hasProjectRegistry ?loc}`
+    
     // until CSS is a provider
     lbdLocation = 'http://localhost:3000/lbd/'
 
